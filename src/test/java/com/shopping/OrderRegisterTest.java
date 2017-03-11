@@ -3,6 +3,7 @@ package com.shopping;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -24,6 +25,7 @@ public class OrderRegisterTest {
         orderRepository = null;
     }
 
+    @Test
     public void canSubmitOrder() {
         //given
         List<LineItem> lineItems = new ArrayList<>();
@@ -41,7 +43,7 @@ public class OrderRegisterTest {
         Order order = orderRegister.submitOrder(lineItems, "daniel.j.aquino@gmail.com", address);
 
         //then
-        Assert.assertTrue(order.getOrderId().length() > 0, "Should have valid order id");
+        Assert.assertTrue("Should have valid order id", order.getOrderId().length() > 0);
         Assert.assertEquals(expectedSubtotal, order.getSubtotal());
         Assert.assertEquals(expectedTax, order.getTax());
         Assert.assertEquals(expectedTotal, order.getTotal());
