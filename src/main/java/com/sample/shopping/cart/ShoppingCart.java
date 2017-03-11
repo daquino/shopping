@@ -21,6 +21,6 @@ public class ShoppingCart {
     }
 
     public int getEntryCount() {
-        return 1;
+        return entries.size();
     }
 }

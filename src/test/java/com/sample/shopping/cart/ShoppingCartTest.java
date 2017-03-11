@@ -37,11 +37,32 @@ public class ShoppingCartTest {
         assertLineEntry(expectedEntry, cartEntry);
     }
 
-    public void assertLineEntry(final LineEntry expectedEntry, final LineEntry actualEntry) {
+    private void assertLineEntry(final LineEntry expectedEntry, final LineEntry actualEntry) {
         Assert.assertEquals(expectedEntry.getSku(), actualEntry.getSku());
         Assert.assertEquals(expectedEntry.getName(), actualEntry.getName());
         Assert.assertEquals(expectedEntry.getQuantity(), actualEntry.getQuantity());
         Assert.assertEquals(expectedEntry.getCost(), actualEntry.getCost());
+    }
+
+    @Test
+    public void canAddMultipleItems() {
+        //given
+        Product numProduct = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
+        Product ponyProduct = new Product("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
+                new BigDecimal(21.99));
+        LineEntry firstExpectedEntry = new TestLineEntry("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", 1,
+                new BigDecimal(9.59).setScale(2, BigDecimal.ROUND_HALF_UP));
+        LineEntry secondExpectedEntry = new TestLineEntry("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
+                1,  new BigDecimal(21.99).setScale(2, BigDecimal.ROUND_HALF_UP));
+
+        //when
+        cart.add(numProduct);
+        cart.add(ponyProduct);
+
+        //then
+        Assert.assertEquals(2, cart.getEntryCount());
+        assertLineEntry(firstExpectedEntry, cart.getEntries().get(0));
+        assertLineEntry(secondExpectedEntry, cart.getEntries().get(1));
     }
 
     private static class TestLineEntry implements LineEntry {
