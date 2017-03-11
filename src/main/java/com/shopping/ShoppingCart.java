@@ -2,39 +2,35 @@ package com.shopping;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class ShoppingCart {
-    private final List<LineItem> items;
+    private final Map<String, LineItem> items;
 
     public ShoppingCart() {
-        this.items = new ArrayList<>();
+        this.items = new LinkedHashMap<>();
     }
 
     public void add(final Product product) {
-        Optional<LineItem> item = items.stream()
-                .filter(i -> i.getSku().equals(product.getSku()))
-                .findFirst();
-        if(item.isPresent()) {
-            CartLineItem cartLineItem = (CartLineItem)item.get();
+        LineItem item = items.get(product.getSku());
+        if (item != null) {
+            CartLineItem cartLineItem = (CartLineItem) item;
             cartLineItem.increment();
         }
         else {
-            items.add(new CartLineItem(product));
+            items.put(product.getSku(), new CartLineItem(product));
         }
     }
 
     public int getItemCount() {
-        return items.stream()
-                .mapToInt(i -> i.getQuantity())
+        return items.values().stream()
+                .mapToInt(LineItem::getQuantity)
                 .sum();
     }
 
     public BigDecimal getSubtotal() {
         BigDecimal subtotal = BigDecimal.ZERO;
-        for (LineItem item : items) {
+        for (LineItem item : items.values()) {
             subtotal = subtotal.add(calculateItemCost(item)).setScale(2, RoundingMode.HALF_UP);
         }
         return subtotal;
@@ -45,7 +41,7 @@ public class ShoppingCart {
     }
 
     public List<LineItem> getLineItems() {
-        return items;
+        return new ArrayList<>(items.values());
     }
 
     private class CartLineItem implements LineItem {
