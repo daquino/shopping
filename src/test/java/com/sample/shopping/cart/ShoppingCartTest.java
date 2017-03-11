@@ -49,6 +49,23 @@ public class ShoppingCartTest {
         Assert.assertEquals(expectedEntry.getCost(), actualEntry.getCost());
     }
 
+    @Test
+    public void canAddSameItemMultipleTimes() {
+        //given
+        Product ponyProduct = new Product("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
+                new BigDecimal(21.99));
+        LineEntry secondExpectedEntry = new TestLineEntry("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
+                2,  new BigDecimal(43.98).setScale(2, BigDecimal.ROUND_HALF_UP));
+
+        //when
+        cart.add(ponyProduct);
+        cart.add(ponyProduct);
+
+        //then
+        Assert.assertEquals(2, cart.getEntryCount());
+        assertLineEntry(secondExpectedEntry, cart.getEntries().get(0));
+    }
+
     private static class TestLineEntry implements LineEntry {
         private String sku;
         private String name;
