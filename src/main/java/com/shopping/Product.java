@@ -10,7 +10,7 @@ public class Product {
     public Product(final String sku, final String name, final BigDecimal price) {
         this.sku = sku;
         this.name = name;
-        this.price = price;
+        this.price = price.setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 
     public String getSku() {
