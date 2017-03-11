@@ -1,15 +1,28 @@
 package com.shopping;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
 
 public class ShoppingCartTest {
+    private ShoppingCart cart;
+
+    @Before
+    public void setUp() {
+        cart = new ShoppingCart();
+    }
+
+    @After
+    public void tearDown() {
+        cart = null;
+    }
+
     @Test
     public void canAddItems() {
         //given
-        ShoppingCart cart = new ShoppingCart();
         Product nomProduct = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
         Product ponyProduct = new Product("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
                 new BigDecimal(21.99));
@@ -39,7 +52,6 @@ public class ShoppingCartTest {
     @Test
     public void canAddSameItemMultipleTimes() {
         //given
-        ShoppingCart cart = new ShoppingCart();
         Product ponyProduct = new Product("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
                 new BigDecimal(21.99));
         LineItem expectedItem = new TestLineItem("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset", 3,
