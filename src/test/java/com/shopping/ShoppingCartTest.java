@@ -26,10 +26,8 @@ public class ShoppingCartTest {
         Product nomProduct = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
         Product ponyProduct = new Product("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
                 new BigDecimal(21.99));
-        LineItem firstExpectedItem = new TestLineItem("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", 1,
-                new BigDecimal(9.59).setScale(2, BigDecimal.ROUND_HALF_UP));
-        LineItem secondExpectedItem = new TestLineItem("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset", 1,
-                new BigDecimal(21.99).setScale(2, BigDecimal.ROUND_HALF_UP));
+        LineItem firstExpectedItem = new LineItem(nomProduct, 1);
+        LineItem secondExpectedItem = new LineItem(ponyProduct, 1);
 
         //when
         cart.add(nomProduct);
@@ -54,8 +52,7 @@ public class ShoppingCartTest {
         //given
         Product ponyProduct = new Product("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
                 new BigDecimal(21.99));
-        LineItem expectedItem = new TestLineItem("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset", 3,
-                new BigDecimal(21.99).setScale(2, BigDecimal.ROUND_HALF_UP));
+        LineItem expectedItem = new LineItem(ponyProduct, 3);
 
         //when
         cart.add(ponyProduct);
@@ -66,36 +63,5 @@ public class ShoppingCartTest {
         Assert.assertEquals(3, cart.getItemCount());
         Assert.assertEquals(new BigDecimal(65.97).setScale(2, BigDecimal.ROUND_HALF_UP), cart.getSubtotal());
         assertLineEntry(expectedItem, cart.getLineItems().get(0));
-    }
-
-    private class TestLineItem implements LineItem {
-        private final String sku;
-        private final String name;
-        private final int quantity;
-        private final BigDecimal price;
-
-        public TestLineItem(final String sku, final String name, final int quantity, final BigDecimal price) {
-            this.sku = sku;
-            this.name = name;
-            this.quantity = quantity;
-            this.price = price;
-        }
-
-
-        public String getSku() {
-            return sku;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public int getQuantity() {
-            return quantity;
-        }
-
-        public BigDecimal getPrice() {
-            return price;
-        }
     }
 }

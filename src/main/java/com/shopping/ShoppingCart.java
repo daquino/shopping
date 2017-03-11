@@ -49,37 +49,7 @@ public class ShoppingCart {
 
     public List<LineItem> getLineItems() {
         return products.stream()
-                .map(product -> new CartLineItem(product, productCounts.get(product.getSku())))
+                .map(product -> new LineItem(product, productCounts.get(product.getSku())))
                 .collect(Collectors.toList());
-    }
-
-    private class CartLineItem implements LineItem {
-        private final Product product;
-        private int quantity;
-
-        public CartLineItem(final Product product, final int quantity) {
-            this.product = product;
-            this.quantity = quantity;
-        }
-
-        @Override
-        public String getSku() {
-            return product.getSku();
-        }
-
-        @Override
-        public String getName() {
-            return product.getName();
-        }
-
-        @Override
-        public int getQuantity() {
-            return quantity;
-        }
-
-        @Override
-        public BigDecimal getPrice() {
-            return product.getPrice();
-        }
     }
 }
