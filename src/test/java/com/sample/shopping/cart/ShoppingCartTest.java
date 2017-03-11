@@ -22,30 +22,7 @@ public class ShoppingCartTest {
     }
 
     @Test
-    public void canAddSingleItem() {
-        //given
-        Product product = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
-        LineEntry expectedEntry = new TestLineEntry("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", 1,
-                new BigDecimal(9.59).setScale(2, BigDecimal.ROUND_HALF_UP));
-
-        //when
-        cart.add(product);
-
-        //then
-        LineEntry cartEntry = cart.getEntries().get(0);
-        Assert.assertEquals(1, cart.getEntryCount());
-        assertLineEntry(expectedEntry, cartEntry);
-    }
-
-    private void assertLineEntry(final LineEntry expectedEntry, final LineEntry actualEntry) {
-        Assert.assertEquals(expectedEntry.getSku(), actualEntry.getSku());
-        Assert.assertEquals(expectedEntry.getName(), actualEntry.getName());
-        Assert.assertEquals(expectedEntry.getQuantity(), actualEntry.getQuantity());
-        Assert.assertEquals(expectedEntry.getCost(), actualEntry.getCost());
-    }
-
-    @Test
-    public void canAddMultipleItems() {
+    public void canAddItems() {
         //given
         Product numProduct = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
         Product ponyProduct = new Product("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
@@ -63,6 +40,13 @@ public class ShoppingCartTest {
         Assert.assertEquals(2, cart.getEntryCount());
         assertLineEntry(firstExpectedEntry, cart.getEntries().get(0));
         assertLineEntry(secondExpectedEntry, cart.getEntries().get(1));
+    }
+
+    private void assertLineEntry(final LineEntry expectedEntry, final LineEntry actualEntry) {
+        Assert.assertEquals(expectedEntry.getSku(), actualEntry.getSku());
+        Assert.assertEquals(expectedEntry.getName(), actualEntry.getName());
+        Assert.assertEquals(expectedEntry.getQuantity(), actualEntry.getQuantity());
+        Assert.assertEquals(expectedEntry.getCost(), actualEntry.getCost());
     }
 
     private static class TestLineEntry implements LineEntry {
