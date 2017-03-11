@@ -55,14 +55,15 @@ public class ShoppingCartTest {
         Product ponyProduct = new Product("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
                 new BigDecimal(21.99));
         LineEntry secondExpectedEntry = new TestLineEntry("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
-                2,  new BigDecimal(43.98).setScale(2, BigDecimal.ROUND_HALF_UP));
+                3,  new BigDecimal(65.97).setScale(2, BigDecimal.ROUND_HALF_UP));
 
         //when
         cart.add(ponyProduct);
         cart.add(ponyProduct);
+        cart.add(ponyProduct);
 
         //then
-        Assert.assertEquals(2, cart.getEntryCount());
+        Assert.assertEquals(3, cart.getEntryCount());
         assertLineEntry(secondExpectedEntry, cart.getEntries().get(0));
     }
 
