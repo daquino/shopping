@@ -2,7 +2,11 @@ package com.shopping;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ShoppingCart {
     private final List<Product> products;
@@ -32,7 +36,7 @@ public class ShoppingCart {
 
     public BigDecimal getSubtotal() {
         BigDecimal subtotal = BigDecimal.ZERO;
-        for(Product product: products) {
+        for (Product product : products) {
             int count = productCounts.get(product.getSku());
             subtotal = subtotal.add(calculateItemCost(product.getPrice(), count)).setScale(2, RoundingMode.HALF_UP);
         }
@@ -44,12 +48,9 @@ public class ShoppingCart {
     }
 
     public List<LineItem> getLineItems() {
-        List<LineItem> items = new ArrayList<>();
-        for(Product product: products) {
-            int quantity = productCounts.get(product.getSku());
-            items.add(new CartLineItem(product, quantity));
-        }
-        return items;
+        return products.stream()
+                .map(product -> new CartLineItem(product, productCounts.get(product.getSku())))
+                .collect(Collectors.toList());
     }
 
     private class CartLineItem implements LineItem {
