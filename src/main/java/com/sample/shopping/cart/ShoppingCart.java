@@ -55,7 +55,7 @@ public class ShoppingCart {
         private final int quantity;
         private final BigDecimal cost;
 
-        public SimpleLineEntry(final String sku, final String name, final int quantity, final BigDecimal cost) {
+        private SimpleLineEntry(final String sku, final String name, final int quantity, final BigDecimal cost) {
             this.sku = sku;
             this.name = name;
             this.quantity = quantity;
