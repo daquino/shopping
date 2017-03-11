@@ -29,4 +29,8 @@ public class CartEntry implements LineEntry {
     public BigDecimal getCost() {
         return product.getPrice().multiply(BigDecimal.valueOf(quantity)).setScale(2, RoundingMode.HALF_UP);
     }
+
+    public void increment() {
+        quantity++;
+    }
 }
