@@ -1,8 +1,6 @@
 package com.shopping;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -30,6 +28,37 @@ public class ShoppingCartTest {
         Assert.assertEquals(expectedItem.getSku(), actalItem.getSku());
         Assert.assertEquals(expectedItem.getName(), actalItem.getName());
         Assert.assertEquals(expectedItem.getQuantity(), actalItem.getQuantity());
-        Assert.assertEquals(expectedItem.getCost(), actalItem.getCost());
+        Assert.assertEquals(expectedItem.getPrice(), actalItem.getPrice());
+    }
+
+    private class TestLineItem implements LineItem {
+        private final String sku;
+        private final String name;
+        private final int quantity;
+        private final BigDecimal price;
+
+        public TestLineItem(final String sku, final String name, final int quantity, final BigDecimal price) {
+            this.sku = sku;
+            this.name = name;
+            this.quantity = quantity;
+            this.price = price;
+        }
+
+
+        public String getSku() {
+            return sku;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getQuantity() {
+            return quantity;
+        }
+
+        public BigDecimal getPrice() {
+            return price;
+        }
     }
 }
