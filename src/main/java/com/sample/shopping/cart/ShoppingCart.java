@@ -32,6 +32,8 @@ public class ShoppingCart {
     }
 
     public int getEntryCount() {
-        return entries.size();
+        return entries.stream()
+                .mapToInt(LineEntry::getQuantity)
+                .sum();
     }
 }
