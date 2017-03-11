@@ -40,7 +40,7 @@ public class OrderRegisterTest {
         BigDecimal expectedTotal = new BigDecimal(103.50).setScale(2, RoundingMode.HALF_UP);
 
         //when
-        Order order = orderRegister.submitOrder(lineItems, "daniel.j.aquino@gmail.com", address);
+        Order order = orderRegister.submitOrder(lineItems, "daniel.j.aquino@gmail.com", shippingAddress);
 
         //then
         Assert.assertTrue("Should have valid order id", order.getOrderId().length() > 0);
