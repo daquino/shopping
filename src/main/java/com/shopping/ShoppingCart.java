@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ShoppingCart {
     private final List<LineItem> items;
@@ -13,11 +14,22 @@ public class ShoppingCart {
     }
 
     public void add(final Product product) {
-        items.add(new CartLineItem(product));
+        Optional<LineItem> item = items.stream()
+                .filter(i -> i.getSku().equals(product.getSku()))
+                .findFirst();
+        if(item.isPresent()) {
+            CartLineItem cartLineItem = (CartLineItem)item.get();
+            cartLineItem.increment();
+        }
+        else {
+            items.add(new CartLineItem(product));
+        }
     }
 
     public int getItemCount() {
-        return items.size();
+        return items.stream()
+                .mapToInt(i -> i.getQuantity())
+                .sum();
     }
 
     public BigDecimal getSubtotal() {
@@ -63,6 +75,10 @@ public class ShoppingCart {
         @Override
         public BigDecimal getPrice() {
             return product.getPrice();
+        }
+
+        public void increment() {
+            quantity++;
         }
     }
 }
