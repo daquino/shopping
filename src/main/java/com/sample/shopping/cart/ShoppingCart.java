@@ -2,37 +2,32 @@ package com.sample.shopping.cart;
 
 import com.sample.shopping.product.Product;
 
-import javax.sound.sampled.Line;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class ShoppingCart {
-    private final List<LineEntry> entries;
+    private final Map<String, LineEntry> entries;
 
     public ShoppingCart() {
-        entries = new ArrayList<>();
+        entries = new LinkedHashMap<>();
     }
 
     public void add(final Product product) {
-        Optional<LineEntry> entry = entries.stream()
-                .filter(e -> e.getSku().equals(product.getSku()))
-                .findFirst();
-        if(entry.isPresent()) {
-            CartEntry cartEntry = (CartEntry)entry.get();
+        LineEntry entry = entries.get(product.getSku());
+        if(entry != null) {
+            CartEntry cartEntry = (CartEntry)entry;
             cartEntry.increment();
         }
         else {
-            entries.add(new CartEntry(product));
+            entries.put(product.getSku(), new CartEntry(product));
         }
     }
 
     public List<LineEntry> getEntries() {
-        return entries;
+        return new ArrayList<>(entries.values());
     }
 
     public int getEntryCount() {
-        return entries.stream()
+        return entries.values().stream()
                 .mapToInt(LineEntry::getQuantity)
                 .sum();
     }
