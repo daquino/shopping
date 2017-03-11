@@ -5,7 +5,7 @@ import com.sample.shopping.product.Product;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public class CartEntry {
+public class CartEntry implements LineEntry {
     private final Product product;
     private int quantity;
 
