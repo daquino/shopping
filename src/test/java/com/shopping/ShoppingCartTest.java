@@ -7,32 +7,7 @@ import java.math.BigDecimal;
 
 public class ShoppingCartTest {
     @Test
-    public void canAddASingleItem() {
-        //given
-        ShoppingCart cart = new ShoppingCart();
-        Product product = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
-        LineItem expectedLineItem = new TestLineItem("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", 1,
-                new BigDecimal(9.59).setScale(2, BigDecimal.ROUND_HALF_UP));
-
-        //when
-        cart.add(product);
-
-        //then
-        Assert.assertEquals(1, cart.getItemCount());
-        Assert.assertEquals(new BigDecimal(9.59).setScale(2, BigDecimal.ROUND_HALF_UP), cart.getSubtotal());
-        assertLineEntry(expectedLineItem, cart.getLineItems().get(0));
-
-    }
-
-    private void assertLineEntry(final LineItem expectedItem, final LineItem actalItem) {
-        Assert.assertEquals(expectedItem.getSku(), actalItem.getSku());
-        Assert.assertEquals(expectedItem.getName(), actalItem.getName());
-        Assert.assertEquals(expectedItem.getQuantity(), actalItem.getQuantity());
-        Assert.assertEquals(expectedItem.getPrice(), actalItem.getPrice());
-    }
-
-    @Test
-    public void canAddMultipleItems() {
+    public void canAddItems() {
         //given
         ShoppingCart cart = new ShoppingCart();
         Product nomProduct = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
@@ -52,7 +27,13 @@ public class ShoppingCartTest {
         Assert.assertEquals(new BigDecimal(31.58).setScale(2, BigDecimal.ROUND_HALF_UP), cart.getSubtotal());
         assertLineEntry(firstExpectedItem, cart.getLineItems().get(0));
         assertLineEntry(secondExpectedItem, cart.getLineItems().get(1));
+    }
 
+    private void assertLineEntry(final LineItem expectedItem, final LineItem actalItem) {
+        Assert.assertEquals(expectedItem.getSku(), actalItem.getSku());
+        Assert.assertEquals(expectedItem.getName(), actalItem.getName());
+        Assert.assertEquals(expectedItem.getQuantity(), actalItem.getQuantity());
+        Assert.assertEquals(expectedItem.getPrice(), actalItem.getPrice());
     }
 
     private class TestLineItem implements LineItem {
