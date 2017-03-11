@@ -20,7 +20,7 @@ public class ShoppingCartTest {
         cart.add(product);
 
         //then
-        Assert.assertEquals(1, cart.getEntryCount());
+        Assert.assertEquals(1, cart.getItemCount());
         Assert.assertEquals(new BigDecimal(9.59).setScale(2, BigDecimal.ROUND_HALF_UP), cart.getSubtotal());
         assertLineEntry(expectedLineItem, cart.getLineItems().get(0));
 
