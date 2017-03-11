@@ -11,28 +11,28 @@ import java.util.Map;
 
 public class ShoppingCart {
     private final List<Product> products;
-    private final Map<String, Integer> productCountMap;
+    private final Map<String, Integer> productCounts;
 
     public ShoppingCart() {
         products = new ArrayList<>();
-        productCountMap = new HashMap<>();
+        productCounts = new HashMap<>();
     }
 
     public void add(final Product product) {
-        int productCount = productCountMap.getOrDefault(product.getSku(), 0);
+        int productCount = productCounts.getOrDefault(product.getSku(), 0);
         if (productCount > 0) {
-            productCountMap.put(product.getSku(), ++productCount);
+            productCounts.put(product.getSku(), ++productCount);
         }
         else {
             products.add(product);
-            productCountMap.put(product.getSku(), 1);
+            productCounts.put(product.getSku(), 1);
         }
     }
 
     public List<LineEntry> getEntries() {
         List<LineEntry> entries = new ArrayList<>();
         for (Product product : products) {
-            int productCount = productCountMap.get(product.getSku());
+            int productCount = productCounts.get(product.getSku());
             entries.add(new SimpleLineEntry(product.getSku(), product.getName(), productCount,
                     calculateCost(product.getPrice(), productCount)));
         }
@@ -44,7 +44,7 @@ public class ShoppingCart {
     }
 
     public int getEntryCount() {
-        return productCountMap.values().stream()
+        return productCounts.values().stream()
                 .mapToInt(price -> price)
                 .sum();
     }
