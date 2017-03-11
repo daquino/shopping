@@ -5,52 +5,60 @@ import java.math.RoundingMode;
 import java.util.*;
 
 public class ShoppingCart {
-    private final Map<String, LineItem> items;
+    private final List<Product> products;
+    private final Map<String, Integer> productCounts;
 
     public ShoppingCart() {
-        this.items = new LinkedHashMap<>();
+        this.products = new ArrayList<>();
+        this.productCounts = new HashMap<>();
     }
 
     public void add(final Product product) {
-        LineItem item = items.get(product.getSku());
-        if (item != null) {
-            CartLineItem cartLineItem = (CartLineItem) item;
-            cartLineItem.increment();
+        int count = productCounts.getOrDefault(product.getSku(), 0);
+        if (count > 0) {
+            productCounts.put(product.getSku(), ++count);
         }
         else {
-            items.put(product.getSku(), new CartLineItem(product));
+            products.add(product);
+            productCounts.put(product.getSku(), 1);
         }
     }
 
     public int getItemCount() {
-        return items.values().stream()
-                .mapToInt(LineItem::getQuantity)
+        return productCounts.values().stream()
+                .mapToInt(count -> count)
                 .sum();
     }
 
     public BigDecimal getSubtotal() {
         BigDecimal subtotal = BigDecimal.ZERO;
-        for (LineItem item : items.values()) {
-            subtotal = subtotal.add(calculateItemCost(item)).setScale(2, RoundingMode.HALF_UP);
+        for(Product product: products) {
+            int count = productCounts.get(product.getSku());
+            subtotal = subtotal.add(calculateItemCost(product.getPrice(), count)).setScale(2, RoundingMode.HALF_UP);
         }
         return subtotal;
     }
 
-    private BigDecimal calculateItemCost(final LineItem item) {
-        return item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())).setScale(2, BigDecimal.ROUND_HALF_UP);
+    private BigDecimal calculateItemCost(final BigDecimal price, int count) {
+        return price.multiply(BigDecimal.valueOf(count)).setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 
     public List<LineItem> getLineItems() {
-        return new ArrayList<>(items.values());
+        List<LineItem> items = new ArrayList<>();
+        for(Product product: products) {
+            int quantity = productCounts.get(product.getSku());
+            items.add(new CartLineItem(product, quantity));
+        }
+        return items;
     }
 
     private class CartLineItem implements LineItem {
         private final Product product;
         private int quantity;
 
-        public CartLineItem(final Product product) {
+        public CartLineItem(final Product product, final int quantity) {
             this.product = product;
-            quantity = 1;
+            this.quantity = quantity;
         }
 
         @Override
@@ -71,10 +79,6 @@ public class ShoppingCart {
         @Override
         public BigDecimal getPrice() {
             return product.getPrice();
-        }
-
-        public void increment() {
-            quantity++;
         }
     }
 }
