@@ -8,6 +8,8 @@ import org.mockito.Mockito;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashMap;
+import java.util.Map;
 
 public class OrderRegisterTest {
     private OrderRegister orderRegister;
@@ -21,7 +23,7 @@ public class OrderRegisterTest {
     @Before
     public void setUp() {
         orderRepository = Mockito.mock(OrderRepository.class);
-        salesTaxDeterminer = Mockito.mock(SalesTaxDeterminer.class);
+        salesTaxDeterminer = new FakeSalesTaxDeterminer();
         orderRegister = new OrderRegister(orderRepository, salesTaxDeterminer);
         cart = new ShoppingCart();
         nomProduct = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
@@ -44,8 +46,7 @@ public class OrderRegisterTest {
         BigDecimal expectedTax = new BigDecimal(8.76).setScale(2, RoundingMode.HALF_UP);
         BigDecimal expectedTotal = new BigDecimal(103.50).setScale(2, RoundingMode.HALF_UP);
         LineItem expectedNomItem = new LineItem(nomProduct, 3);
-        LineItem expectedPonyItem = new LineItem(ponyProduct, 3);
-        Mockito.when(salesTaxDeterminer.determineSalesTax(shippingAddress.getState())).thenReturn(0.0925f);
+        LineItem expectedPonyItem = new LineItem(ponyProduct, 3); 
 
         //when
         Order order = orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
@@ -101,5 +102,19 @@ public class OrderRegisterTest {
 
         //then
         Mockito.verify(orderRepository).save(Mockito.any(Order.class));
+    }
+
+    private static class FakeSalesTaxDeterminer implements SalesTaxDeterminer {
+        private final Map<String, Float> salesTaxMap;
+
+        public FakeSalesTaxDeterminer() {
+            salesTaxMap = new HashMap<>();
+            salesTaxMap.put("TN", 0.0925f);
+        }
+
+        @Override
+        public float determineSalesTax(final String state) {
+            return salesTaxMap.getOrDefault(state, 0.01f);
+        }
     }
 }
