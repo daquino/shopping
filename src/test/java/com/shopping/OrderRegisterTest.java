@@ -4,19 +4,14 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-@RunWith(MockitoJUnitRunner.class)
 public class OrderRegisterTest {
     private OrderRegister orderRegister;
-    @Mock
-    private OrderRepository orderRepository;
+    private MockOrderRepository orderRepository;
     private ShoppingCart cart;
     private Product nomProduct;
     private Product ponyProduct;
@@ -24,6 +19,7 @@ public class OrderRegisterTest {
 
     @Before
     public void setUp() {
+        orderRepository = new MockOrderRepository();
         orderRegister = new OrderRegister(orderRepository);
         cart = new ShoppingCart();
         nomProduct = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
@@ -101,6 +97,24 @@ public class OrderRegisterTest {
         orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
 
         //then
-        Mockito.verify(orderRepository).save(Mockito.any(Order.class));
+        orderRepository.verifySaveCalled();
+
+    }
+
+    private class MockOrderRepository implements OrderRepository {
+        private boolean calledSave;
+
+        public MockOrderRepository() {
+            this.calledSave = false;
+        }
+
+        @Override
+        public void save(final Order order) {
+            calledSave = true;
+        }
+
+        public void verifySaveCalled() {
+            Assert.assertTrue("save() method should have been called.", calledSave);
+        }
     }
 }
