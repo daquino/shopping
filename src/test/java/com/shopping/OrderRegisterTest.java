@@ -10,7 +10,7 @@ import java.math.RoundingMode;
 
 public class OrderRegisterTest {
     private OrderRegister orderRegister;
-    private MockOrderRepository orderRepository;
+    private SpyOrderRepository orderRepository;
     private ShoppingCart cart;
     private Product nomProduct;
     private Product ponyProduct;
@@ -18,7 +18,7 @@ public class OrderRegisterTest {
 
     @Before
     public void setUp() {
-        orderRepository = new MockOrderRepository();
+        orderRepository = new SpyOrderRepository();
         orderRegister = new OrderRegister(orderRepository);
         cart = new ShoppingCart();
         nomProduct = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
@@ -80,40 +80,42 @@ public class OrderRegisterTest {
         Assert.assertEquals(order.getShippingAddressZip(), shippingAddress.getZip());
     }
 
-    private void assertLineItem(final LineItem expectedItem, final LineItem actalItem) {
-        Assert.assertEquals(expectedItem.getSku(), actalItem.getSku());
-        Assert.assertEquals(expectedItem.getName(), actalItem.getName());
-        Assert.assertEquals(expectedItem.getQuantity(), actalItem.getQuantity());
-        Assert.assertEquals(expectedItem.getPrice(), actalItem.getPrice());
+    private void assertLineItem(final LineItem expectedItem, final LineItem actualItem) {
+        Assert.assertEquals(expectedItem.getSku(), actualItem.getSku());
+        Assert.assertEquals(expectedItem.getName(), actualItem.getName());
+        Assert.assertEquals(expectedItem.getQuantity(), actualItem.getQuantity());
+        Assert.assertEquals(expectedItem.getPrice(), actualItem.getPrice());
     }
 
     @Test
     public void placedOrderIsPersisted() {
         //given
         cart.add(nomProduct);
+        LineItem expectedLineItem = new LineItem(nomProduct, 1);
 
         //when
         orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
 
         //then
-        orderRepository.verifySaveCalled();
-
+        Order savedOrder = orderRepository.getOrder();
+        Assert.assertEquals("daniel.j.aquino@gmail.com", savedOrder.getUserId());
+        assertShippingAddress(shippingAddress, savedOrder);
+        assertLineItem(expectedLineItem, savedOrder.getItems().get(0));
     }
 
-    private class MockOrderRepository implements OrderRepository {
-        private boolean calledSave;
+    private class SpyOrderRepository implements OrderRepository {
+        private Order order;
 
-        public MockOrderRepository() {
-            this.calledSave = false;
+        public SpyOrderRepository() {
         }
 
         @Override
         public void save(final Order order) {
-            calledSave = true;
+            this.order = order;
         }
 
-        public void verifySaveCalled() {
-            Assert.assertTrue("save() method should have been called.", calledSave);
+        public Order getOrder() {
+            return order;
         }
     }
 }
