@@ -4,18 +4,13 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-@RunWith(MockitoJUnitRunner.class)
 public class OrderRegisterTest {
     private OrderRegister orderRegister;
-    @Mock
     private OrderRepository orderRepository;
     private ShoppingCart cart;
     private Product nomProduct;
@@ -24,6 +19,7 @@ public class OrderRegisterTest {
 
     @Before
     public void setUp() {
+        orderRepository = Mockito.mock(OrderRepository.class);
         orderRegister = new OrderRegister(orderRepository);
         cart = new ShoppingCart();
         nomProduct = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
