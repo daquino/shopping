@@ -12,6 +12,7 @@ import java.math.RoundingMode;
 public class OrderRegisterTest {
     private OrderRegister orderRegister;
     private OrderRepository orderRepository;
+    private SalesTaxDeterminer salesTaxDeterminer;
     private ShoppingCart cart;
     private Product nomProduct;
     private Product ponyProduct;
@@ -20,7 +21,8 @@ public class OrderRegisterTest {
     @Before
     public void setUp() {
         orderRepository = Mockito.mock(OrderRepository.class);
-        orderRegister = new OrderRegister(orderRepository);
+        salesTaxDeterminer = Mockito.mock(SalesTaxDeterminer.class);
+        orderRegister = new OrderRegister(orderRepository, salesTaxDeterminer);
         cart = new ShoppingCart();
         nomProduct = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
         ponyProduct = new Product("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
@@ -43,6 +45,7 @@ public class OrderRegisterTest {
         BigDecimal expectedTotal = new BigDecimal(103.50).setScale(2, RoundingMode.HALF_UP);
         LineItem expectedNomItem = new LineItem(nomProduct, 3);
         LineItem expectedPonyItem = new LineItem(ponyProduct, 3);
+        Mockito.when(salesTaxDeterminer.determineSalesTax(shippingAddress.getState())).thenReturn(0.0925f);
 
         //when
         Order order = orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
