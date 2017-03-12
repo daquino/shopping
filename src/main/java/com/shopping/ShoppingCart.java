@@ -17,14 +17,16 @@ public class ShoppingCart {
         this.productCounts = new HashMap<>();
     }
 
-    public void add(final Product product) {
-        int count = productCounts.getOrDefault(product.getSku(), 0);
-        if (count > 0) {
-            productCounts.put(product.getSku(), ++count);
-        }
-        else {
-            products.add(product);
-            productCounts.put(product.getSku(), 1);
+    public void add(final Product... products) {
+        for (Product product : products) {
+            int count = productCounts.getOrDefault(product.getSku(), 0);
+            if (count > 0) {
+                productCounts.put(product.getSku(), ++count);
+            }
+            else {
+                this.products.add(product);
+                productCounts.put(product.getSku(), 1);
+            }
         }
     }
 
