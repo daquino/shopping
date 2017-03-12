@@ -36,7 +36,12 @@ public class OrderRegisterTest {
         Product ponyProduct = new Product("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
                 new BigDecimal(21.99));
         ShoppingCart cart = new ShoppingCart();
-        cart.add(nomProduct, nomProduct, nomProduct, ponyProduct, ponyProduct, ponyProduct);
+        cart.add(nomProduct);
+        cart.add(nomProduct);
+        cart.add(nomProduct);
+        cart.add(ponyProduct);
+        cart.add(ponyProduct);
+        cart.add(ponyProduct);
         ShippingAddress shippingAddress = new ShippingAddress("Daniel Aquino", "1234 Test Street", "Suite 100", "Nashville", "TN", "37013");
         BigDecimal expectedSubtotal = new BigDecimal(94.74).setScale(2, RoundingMode.HALF_UP);
         BigDecimal expectedTax = new BigDecimal(8.76).setScale(2, RoundingMode.HALF_UP);
@@ -48,20 +53,24 @@ public class OrderRegisterTest {
         Order order = orderRegister.submitOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
 
         //then
+        Mockito.verify(orderRepository).save(Mockito.any(Order.class));
         Assert.assertTrue("Should have valid order id", order.getOrderId().length() > 0);
         Assert.assertEquals(expectedSubtotal, order.getSubtotal());
         Assert.assertEquals(expectedTax, order.getTax());
         Assert.assertEquals(expectedTotal, order.getTotal());
         Assert.assertEquals("daniel.j.aquino@gmail.com", order.getUserId());
+        assertShippingAddress(shippingAddress, order);
+        assertLineItem(expectedNomItem, order.getItems().get(0));
+        assertLineItem(expectedPonyItem, order.getItems().get(1));
+    }
+
+    private void assertShippingAddress(final ShippingAddress shippingAddress, final Order order) {
         Assert.assertEquals(order.getShippingAddressTo(), shippingAddress.getTo());
         Assert.assertEquals(order.getShippingAddressLineOne(), shippingAddress.getLineOne());
         Assert.assertEquals(order.getShippingAddressLineTwo(), shippingAddress.getLineTwo());
         Assert.assertEquals(order.getShippingAddressCity(), shippingAddress.getCity());
         Assert.assertEquals(order.getShippingAddressState(), shippingAddress.getState());
         Assert.assertEquals(order.getShippingAddressZip(), shippingAddress.getZip());
-        assertLineItem(expectedNomItem, order.getItems().get(0));
-        assertLineItem(expectedPonyItem, order.getItems().get(1));
-        Mockito.verify(orderRepository).save(Mockito.any(Order.class));
     }
 
     private void assertLineItem(final LineItem expectedItem, final LineItem actalItem) {
