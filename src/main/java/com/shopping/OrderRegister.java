@@ -13,9 +13,9 @@ public class OrderRegister {
         this.taxPercentage = 0.0925f;
     }
 
-    public Order submitOrder(final ShoppingCart cart,
-                             final String userId,
-                             final ShippingAddress shippingAddress) {
+    public Order placeOrder(final ShoppingCart cart,
+                            final String userId,
+                            final ShippingAddress shippingAddress) {
         BigDecimal subtotal = cart.getSubtotal();
         BigDecimal tax = calculateTax(subtotal);
         Order order = new Order(generateOrderId(), subtotal, tax, calculateTotal(subtotal, tax),

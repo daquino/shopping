@@ -39,7 +39,7 @@ public class OrderRegisterTest {
     }
 
     @Test
-    public void canSubmitOrder() {
+    public void canPlaceOrder() {
         //given
         setupMultiItemCart();
         BigDecimal expectedSubtotal = new BigDecimal(94.74).setScale(2, RoundingMode.HALF_UP);
@@ -49,7 +49,7 @@ public class OrderRegisterTest {
         LineItem expectedPonyItem = new LineItem(ponyProduct, 3);
 
         //when
-        Order order = orderRegister.submitOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
+        Order order = orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
 
         //then
         Assert.assertTrue("Should have valid order id", order.getOrderId().length() > 0);
@@ -93,12 +93,12 @@ public class OrderRegisterTest {
     }
 
     @Test
-    public void submittedOrderIsPersisted() {
+    public void placedOrderIsPersisted() {
         //given
         cart.add(nomProduct);
 
         //when
-        orderRegister.submitOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
+        orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
 
         //then
         Mockito.verify(orderRepository).save(Mockito.any(Order.class));
