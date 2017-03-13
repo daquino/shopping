@@ -16,7 +16,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrderRepositoryITCase {
+public class JdbcOrderRepositoryITCase {
     private JdbcOrderRepository orderRepository;
     private static RelationalInstance instance;
 
