@@ -96,7 +96,7 @@ public class OrderRegisterTest {
         orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
 
         //then
-        orderRepository.verifySaveCalled();
+        orderRepository.verify();
 
     }
 
@@ -112,7 +112,7 @@ public class OrderRegisterTest {
             calledSave = true;
         }
 
-        public void verifySaveCalled() {
+        public void verify() {
             Assert.assertTrue("save() method should have been called.", calledSave);
         }
     }
