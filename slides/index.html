@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h2>Automated Tests</h2>
+				</section>
+				<section>
+					<h3>Agenda</h3>
+					<ul>
+						<li>Talk about why we test in general</li>
+						<li>Discuss two main approaches to testing</li>
+						<li>Unit Tests</li>
+						<li>Test Doubles (i.e. "Mocks")</li>
+						<li>Integration Testing</li>
+						<li>Test Driven Development</li>
+						<li>Code walkthrough</li>
+						<li>Open discussion</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Goals</h3>
+					<ul>
+						<li>Learn about basic automated test concepts</li>
+						<li>Learn about TDD at a high level</li>
+						<li>Learn about tradeoffs from others</li>
+						<li>Walk away with knowledge to help you decide if automated tests are right for you</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Why do we test?</h3>
+					<ul>
+						<li class="fragment">Validate that our code follows behavior that our clients expect</li>
+						<li class="fragment">Prevent regression when code changes</li>
+					</ul>
+				</section>
+				<section>
+					<section>
+   					<h3>What are ways we can test?</h3>
+					</section>
+					<section>
+						<h3>Manual Testing</h3>
+						<ul>
+							<li>Testing through the UI</li>
+							<li>Developer testing in interactive environment</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Automated Testing</h3>
+						<ul>
+							<li>Unit Tests</li>
+							<li>Integration Tests</li>
+							<li>Functional Tests/End to End Tests (i.e. Selenium)</li>
+						</ul>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h3>Unit Tests</h3>
+					</section>
+					<section>
+						<h3>What is a unit?</h3>
+						<ul>
+							<li class="fragment">Class level?</li>
+							<li class="fragment">Method level?</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Unit Test Structure</h3>
+						<ul>
+							<li>Setup state</li>
+							<li>Perform some action</li>
+							<li>Verify result</li>
+						</ul>
+					</section>
+					<section>
+						<h3>JUnit Example</h3>
+						<pre><code class="java" style="font-size: 16px" data-trim contenteditable>
+							@Test
+					    public void canAddItems() {
+					        //given
+					        Product nomProduct = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
+					        Product ponyProduct = new Product("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
+					                new BigDecimal(21.99));
+					        BigDecimal expectedSubtotal = new BigDecimal(31.58).setScale(2, BigDecimal.ROUND_HALF_UP);
+					        LineItem firstExpectedItem = new LineItem(nomProduct, 1);
+					        LineItem secondExpectedItem = new LineItem(ponyProduct, 1);
+
+					        //when
+					        cart.add(nomProduct);
+					        cart.add(ponyProduct);
+
+					        //then
+					        Assert.assertEquals(2, cart.getItemCount());
+					        Assert.assertEquals(expectedSubtotal, cart.getSubtotal());
+					        assertLineEntry(firstExpectedItem, cart.getLineItems().get(0));
+					        assertLineEntry(secondExpectedItem, cart.getLineItems().get(1));
+					    }
+
+					    private void assertLineEntry(final LineItem expectedItem, final LineItem actualItem) {
+					        Assert.assertEquals(expectedItem.getSku(), actualItem.getSku());
+					        Assert.assertEquals(expectedItem.getName(), actualItem.getName());
+					        Assert.assertEquals(expectedItem.getQuantity(), actualItem.getQuantity());
+					        Assert.assertEquals(expectedItem.getPrice(), actualItem.getPrice());
+					    }
+						</code></pre>
+					</section>
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				history: true,
+
+				// More info https://github.com/hakimel/reveal.js#dependencies
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>

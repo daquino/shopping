@@ -26,6 +26,7 @@ public class ShoppingCartTest {
         Product nomProduct = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
         Product ponyProduct = new Product("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
                 new BigDecimal(21.99));
+        BigDecimal expectedSubtotal = new BigDecimal(31.58).setScale(2, BigDecimal.ROUND_HALF_UP);
         LineItem firstExpectedItem = new LineItem(nomProduct, 1);
         LineItem secondExpectedItem = new LineItem(ponyProduct, 1);
 
@@ -35,16 +36,16 @@ public class ShoppingCartTest {
 
         //then
         Assert.assertEquals(2, cart.getItemCount());
-        Assert.assertEquals(new BigDecimal(31.58).setScale(2, BigDecimal.ROUND_HALF_UP), cart.getSubtotal());
+        Assert.assertEquals(expectedSubtotal, cart.getSubtotal());
         assertLineEntry(firstExpectedItem, cart.getLineItems().get(0));
         assertLineEntry(secondExpectedItem, cart.getLineItems().get(1));
     }
 
-    private void assertLineEntry(final LineItem expectedItem, final LineItem actalItem) {
-        Assert.assertEquals(expectedItem.getSku(), actalItem.getSku());
-        Assert.assertEquals(expectedItem.getName(), actalItem.getName());
-        Assert.assertEquals(expectedItem.getQuantity(), actalItem.getQuantity());
-        Assert.assertEquals(expectedItem.getPrice(), actalItem.getPrice());
+    private void assertLineEntry(final LineItem expectedItem, final LineItem actualItem) {
+        Assert.assertEquals(expectedItem.getSku(), actualItem.getSku());
+        Assert.assertEquals(expectedItem.getName(), actualItem.getName());
+        Assert.assertEquals(expectedItem.getQuantity(), actualItem.getQuantity());
+        Assert.assertEquals(expectedItem.getPrice(), actualItem.getPrice());
     }
 
     @Test
