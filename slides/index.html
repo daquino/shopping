@@ -50,11 +50,16 @@
 					</ul>
 				</section>
 				<section>
-					<h3>Why do we test?</h3>
-					<ul>
-						<li class="fragment">Validate that our code follows behavior that our clients expect</li>
-						<li class="fragment">Prevent regression when code changes</li>
-					</ul>
+					<section>
+						<h3>Why do we test?</h3>
+						<ul>
+							<li class="fragment">Validate that our code follows behavior that our clients expect</li>
+							<li class="fragment">Prevent regression when code changes</li>
+						</ul>
+					</section>
+					<section>
+						<h3>The underlying goal is working software.</h3>
+					</section>
 				</section>
 				<section>
 					<section>
@@ -63,16 +68,16 @@
 					<section>
 						<h3>Manual Testing</h3>
 						<ul>
-							<li>Testing through the UI</li>
-							<li>Developer testing in interactive environment</li>
+							<li class="fragment">Testing through the UI</li>
+							<li class="fragment">Developer testing in an interactive environment (i.e. REPL)</li>
 						</ul>
 					</section>
 					<section>
 						<h3>Automated Testing</h3>
 						<ul>
-							<li>Unit Tests</li>
-							<li>Integration Tests</li>
-							<li>Functional Tests/End to End Tests (i.e. Selenium)</li>
+							<li class="fragment">Unit Tests</li>
+							<li class="fragment">Integration Tests</li>
+							<li class="fragment">Functional Tests/End to End Tests (i.e. Selenium)</li>
 						</ul>
 					</section>
 				</section>
@@ -97,40 +102,221 @@
 					</section>
 					<section>
 						<h3>JUnit Example</h3>
-						<pre><code class="java" style="font-size: 16px" data-trim contenteditable>
+						<pre><code class="java" style="font-size: 18px" data-trim contenteditable>
 							@Test
-					    public void canAddItems() {
-					        //given
-					        Product nomProduct = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
-					        Product ponyProduct = new Product("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
-					                new BigDecimal(21.99));
-					        BigDecimal expectedSubtotal = new BigDecimal(31.58).setScale(2, BigDecimal.ROUND_HALF_UP);
-					        LineItem firstExpectedItem = new LineItem(nomProduct, 1);
-					        LineItem secondExpectedItem = new LineItem(ponyProduct, 1);
+							public void canAddItems() {
+							    //given
+							    ShoppingCart cart = new ShoppingCart();
+							    Product nomProduct = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
+							    Product ponyProduct = new Product("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
+							            new BigDecimal(21.99));
+							    BigDecimal expectedSubtotal = new BigDecimal(31.58).setScale(2, BigDecimal.ROUND_HALF_UP);
+							    LineItem firstExpectedItem = new LineItem(nomProduct, 1);
+							    LineItem secondExpectedItem = new LineItem(ponyProduct, 1);
 
-					        //when
-					        cart.add(nomProduct);
-					        cart.add(ponyProduct);
+							    //when
+							    cart.add(nomProduct);
+							    cart.add(ponyProduct);
 
-					        //then
-					        Assert.assertEquals(2, cart.getItemCount());
-					        Assert.assertEquals(expectedSubtotal, cart.getSubtotal());
-					        assertLineEntry(firstExpectedItem, cart.getLineItems().get(0));
-					        assertLineEntry(secondExpectedItem, cart.getLineItems().get(1));
-					    }
+							    //then
+							    Assert.assertEquals(2, cart.getItemCount());
+							    Assert.assertEquals(expectedSubtotal, cart.getSubtotal());
+							    assertLineEntry(firstExpectedItem, cart.getLineItems().get(0));
+							    assertLineEntry(secondExpectedItem, cart.getLineItems().get(1));
+							}
 
-					    private void assertLineEntry(final LineItem expectedItem, final LineItem actualItem) {
-					        Assert.assertEquals(expectedItem.getSku(), actualItem.getSku());
-					        Assert.assertEquals(expectedItem.getName(), actualItem.getName());
-					        Assert.assertEquals(expectedItem.getQuantity(), actualItem.getQuantity());
-					        Assert.assertEquals(expectedItem.getPrice(), actualItem.getPrice());
-					    }
+							private void assertLineEntry(final LineItem expectedItem, final LineItem actualItem) {
+							    Assert.assertEquals(expectedItem.getSku(), actualItem.getSku());
+							    Assert.assertEquals(expectedItem.getName(), actualItem.getName());
+							    Assert.assertEquals(expectedItem.getQuantity(), actualItem.getQuantity());
+							    Assert.assertEquals(expectedItem.getPrice(), actualItem.getPrice());
+							}
 						</code></pre>
 					</section>
 				</section>
 				<section>
 					<section>
 						<h3>Test Doubles (i.e. "Mocks")</h3>
+					</section>
+					<section>
+						<h3>Types of test doubles</h3>
+						<ul>
+							<li>Dummy</li>
+							<li>Fake</li>
+							<li>Stub</li>
+							<li>Spy</li>
+							<li>Mock</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Dummy</h3>
+						<p>Passed around but never used</p>
+						<pre><code class="java" style="font-size: 18px" data-trim contenteditable>
+							@Before
+							public void setUp() {
+							    //....omitted
+							    orderRegister = new OrderRegister(null, null);
+							    //....omitted
+							}
+
+							@Test
+							public void canPlaceOrder() {
+							    //given
+							    //omitted
+
+							    //when
+							    Order order = orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
+
+							    //then
+							    //omitted
+							}
+						</code></pre>
+					</section>
+					<section>
+						<h3>Fake</h3>
+						<p>Have working implementations but take shortcuts that make them not suitable for production.</p>
+						<pre><code class="java" style="font-size: 18px" data-trim contenteditable>
+							private static class FakeSalesTaxDeterminer implements SalesTaxDeterminer {
+							    private final Map&lt;String, Float&gt; salesTaxMap;
+
+							    public FakeSalesTaxDeterminer() {
+							        salesTaxMap = new HashMap&lt;String, Float&gt;();
+							        salesTaxMap.put("TN", 0.0925f);
+							    }
+
+							    @Override
+							    public float determineSalesTax(final String state) {
+							        return salesTaxMap.getOrDefault(state, 0.01f);
+							    }
+							}
+
+							@Before
+							public void setUp() {
+							    //....omitted
+							    salesTaxDeterminer = new FakeSalesTaxDeterminer();
+							    orderRegister = new OrderRegister(orderRepository, salesTaxDeterminer);
+							    //....omitted
+							}
+
+							@Test
+							public void canPlaceOrder() {
+							    //given
+							    //expectedSubtotal = $10
+							    //expectedTax = $0.93
+
+							    //when
+							    Order order = orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
+
+							    //then
+							    //....omitted
+							    Assert.assertEquals(expectedTax, new BigDecimal(0.93).setScale(2, BigDecimal.ROUND_HALF_UP));
+							}
+						</code></pre>
+					</section>
+					<section>
+						<h3>Stub</h3>
+						<p>Provide canned responses when called</p>
+						<pre><code class="java" style="font-size: 18px" data-trim contenteditable>
+							private static class StubSalesTaxDeterminer implements SalesTaxDeterminer {
+					        private final float taxPercentage;
+
+					        public StubSalesTaxDeterminer(final float taxPercentage) {
+					            this.taxPercentage = taxPercentage;
+					        }
+
+					        @Override
+					        public float determineSalesTax(final String state) {
+					            return taxPercentage;
+					        }
+					    }
+
+							@Before
+							public void setUp() {
+							    //....omitted
+							    salesTaxDeterminer = new FakeSalesTaxDeterminer(0.0925);
+							    orderRegister = new OrderRegister(orderRepository, salesTaxDeterminer);
+							    //....omitted
+							}
+
+							@Test
+							public void canPlaceOrder() {
+							    //given
+							    //expectedSubtotal = $10
+							    //expectedTax = $0.93
+
+							    //when
+							    Order order = orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
+
+							    //then
+							    //....omitted
+							    Assert.assertEquals(expectedTax, new BigDecimal(0.93).setScale(2, BigDecimal.ROUND_HALF_UP));
+							}
+						</code></pre>
+					</section>
+					<section>
+						<h3>Spy</h3>
+						<p>Record information on how they were called.</p>
+						<pre><code class="java" style="font-size: 18px" data-trim contenteditable>
+							private class SpyOrderRepository implements OrderRepository {
+							    private Order order;
+
+							    public SpyOrderRepository() {
+							    }
+
+							    @Override
+							    public void save(final Order order) {
+							        this.order = order;
+							    }
+
+							    public Order getOrder() {
+							        return order;
+							    }
+							}
+
+							@Before
+							public void setUp() {
+							    //....omitted
+							    orderRepository = new SpyOrderRepository();
+							    orderRegister = new OrderRegister(orderRepository, salesTaxDeterminer);
+							    //....omitted
+							}
+
+							@Test
+							public void placedOrderIsPersisted() {
+							    //given omitted
+
+							    //when
+							    orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
+
+							    //then
+							    Order savedOrder = orderRepository.getOrder();
+							    Assert.assertEquals("daniel.j.aquino@gmail.com", savedOrder.getUserId());
+							}
+						</code></pre>
+					</section>
+					<section>
+						<h3>Mock</h3>
+						<p>Pre-programmed with expectations of calls they should receive</p>
+						<pre><code class="java" style="font-size: 18px" data-trim contenteditable>
+							@Before
+							public void setUp() {
+							    orderRepository = Mockito.mock(OrderRepository.class);
+							    salesTaxDeterminer = Mockito.mock(SalesTaxDeterminer.class);
+							    orderRegister = new OrderRegister(orderRepository, salesTaxDeterminer);
+							}
+
+							@Test
+							public void placedOrderIsPersisted() {
+							    //given
+							    cart.add(nomProduct);
+
+							    //when
+							    orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
+
+							    //then
+							    Mockito.verify(orderRepository).save(Mockito.any(Order.class));
+							}
+						</code></pre>
 					</section>
 				</section>
 				<section>
