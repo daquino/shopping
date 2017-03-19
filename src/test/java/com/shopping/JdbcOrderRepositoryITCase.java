@@ -4,6 +4,7 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 import org.h2.tools.RunScript;
 import org.junit.*;
 
+import javax.management.relation.Relation;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
@@ -36,6 +37,31 @@ public class JdbcOrderRepositoryITCase {
     }
 
     @Test
+    public void canSave() throws SQLException {
+        //given
+        RelationalInstance instance = new RelationalInstance(Paths.get(System.getProperty("sql.schema.path")));
+        OrderRepository orderRepository = new JdbcOrderRepository(instance.getDataSource());
+        Product ponyProduct = new Product("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
+                new BigDecimal(21.99));
+        BigDecimal subtotal = new BigDecimal(21.99).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal tax = new BigDecimal(2.20).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal total = new BigDecimal(24.19).setScale(2, BigDecimal.ROUND_HALF_UP);
+        List<LineItem> items = new ArrayList<>();
+        items.add(new LineItem(ponyProduct, 1));
+        ShippingAddress shippingAddress = new ShippingAddress("Daniel Aquino", "1234 Test Street",
+                "Suite 100", "Nashville", "TN", "37013");
+        Order order = new Order("12345", subtotal, tax, total, "daniel.j.aquino@gmail.com",
+                shippingAddress, items);
+
+        //when
+        orderRepository.save(order);
+
+        //then
+        assertOrderDetails(order);
+        assertOrderItems(order);
+    }
+
+    @Test
     public void testSave() throws SQLException {
         //given
         Product ponyProduct = new Product("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
@@ -51,7 +77,6 @@ public class JdbcOrderRepositoryITCase {
                 "Suite 100", "Nashville", "TN", "37013");
         Order order = new Order("12345", subtotal, tax, total, "daniel.j.aquino@gmail.com",
                 shippingAddress, items);
-        Assert.assertEquals(1, 1);
 
         //when
         orderRepository.save(order);
@@ -86,7 +111,6 @@ public class JdbcOrderRepositoryITCase {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     private void assertOrderItems(final Order order) {

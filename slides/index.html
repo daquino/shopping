@@ -107,18 +107,15 @@
 							public void canAddASingleItem() {
 					        //given
 					        ShoppingCart cart = new ShoppingCart();
-					        Product product = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
-					        LineItem expectedLineItem = new TestLineItem("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", 1,
-					                new BigDecimal(9.59).setScale(2, BigDecimal.ROUND_HALF_UP));
+					        Product product = new Product("PROD-1", "Product 1", new BigDecimal(10.00));
 
 					        //when
 					        cart.add(product);
 
 					        //then
 					        Assert.assertEquals(1, cart.getItemCount());
-					        Assert.assertEquals(new BigDecimal(9.59).setScale(2, BigDecimal.ROUND_HALF_UP), cart.getSubtotal());
-					        assertLineEntry(expectedLineItem, cart.getLineItems().get(0));
-
+					        Assert.assertEquals(new BigDecimal(10.00), cart.getSubtotal());
+					        assertLineEntry(new LineItem("PROD-1", "Product 1", 1, new BigDecimal(10.00), cart.getLineItems().get(0));
 					    }
 
 							private void assertLineEntry(final LineItem expectedItem, final LineItem actualItem) {
@@ -172,40 +169,30 @@
 						<h3>Fake</h3>
 						<p>Have working implementations but take shortcuts that make them not suitable for production.</p>
 						<pre><code class="java" style="font-size: 18px" data-trim contenteditable>
-							private static class FakeSalesTaxDeterminer implements SalesTaxDeterminer {
-							    private final Map&lt;String, Float&gt; salesTaxMap;
-
-							    public FakeSalesTaxDeterminer() {
-							        salesTaxMap = new HashMap&lt;String, Float&gt;();
-							        salesTaxMap.put("TN", 0.0925f);
-							    }
-
+							private class FakeTaxCalculator implements TaxCalculator {
+							    private final BigDecimal tax = new BigDecimal(0.1).setScale(2, BigDecimal.ROUND_HALF_UP);
 							    @Override
-							    public float determineSalesTax(final String state) {
-							        return salesTaxMap.getOrDefault(state, 0.01f);
+							    public BigDecimal calculate(final BigDecimal subtotal, final String state) {
+							        return subtotal.multiply(tax).setScale(2, BigDecimal.ROUND_HALF_UP);
 							    }
-							}
-
-							@Before
-							public void setUp() {
-							    //....omitted
-							    taxCalculator = new FakeSalesTaxDeterminer();
-							    orderRegister = new OrderRegister(orderRepository, taxCalculator);
-							    //....omitted
 							}
 
 							@Test
 							public void canPlaceOrder() {
 							    //given
-							    //expectedSubtotal = $10
-							    //expectedTax = $0.93
+							    OrderRegister orderRegister = new OrderRegister(Mockito.mock(OrderRepository.class), new FakeTaxCalculator());
+							    ShoppingCart cart = new ShoppingCart();
+							    cart.add(new Product("PROD-001", "Product 1", new BigDecimal(10.00)));
+							    cart.add(new Product("PROD-002", "Product 2", new BigDecimal(5.00)));
+									ShippingAddress shippingAddress = new ShippingAddress("Daniel Aquino", "1234 Test Street", "", "Nashville", "TN", "37217");
 
 							    //when
 							    Order order = orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
 
 							    //then
-							    //....omitted
-							    Assert.assertEquals(expectedTax, new BigDecimal(0.93).setScale(2, BigDecimal.ROUND_HALF_UP));
+							    assertEquals(new BigDecimal(15.00), order.getSubtotal());
+							    assertEquals(new BigDecimal(1.50), order.getTax());
+							    assertEquals(new BigDecimal(16.50), order.getTotal());
 							}
 						</code></pre>
 					</section>
@@ -213,39 +200,35 @@
 						<h3>Stub</h3>
 						<p>Provide canned responses when called</p>
 						<pre><code class="java" style="font-size: 18px" data-trim contenteditable>
-							private static class StubSalesTaxDeterminer implements SalesTaxDeterminer {
-					        private final float taxPercentage;
+							private static class StubTaxCalculator implements TaxCalculator {
+							    private final BigDecimal tax;
 
-					        public StubSalesTaxDeterminer(final float taxPercentage) {
-					            this.taxPercentage = taxPercentage;
-					        }
+							    public StubTaxCalculator(final BigDecimal tax) {
+							        this.tax = tax.setScale(2, BigDecimal.ROUND_HALF_UP);
+							    }
 
-					        @Override
-					        public float determineSalesTax(final String state) {
-					            return taxPercentage;
-					        }
-					    }
-
-							@Before
-							public void setUp() {
-							    //....omitted
-							    taxCalculator = new FakeSalesTaxDeterminer(0.0925);
-							    orderRegister = new OrderRegister(orderRepository, taxCalculator);
-							    //....omitted
+							    @Override
+							    public BigDecimal calculate(final BigDecimal subtotal, final String state) {
+							        return tax;
+							    }
 							}
 
 							@Test
 							public void canPlaceOrder() {
 							    //given
-							    //expectedSubtotal = $10
-							    //expectedTax = $0.93
+							    OrderRegister orderRegister = new OrderRegister(Mockito.mock(OrderRepository.class), new StubTaxCalculator(new BigDecimal(1.50)));
+							    ShoppingCart cart = new ShoppingCart();
+							    cart.add(new Product("PROD-001", "Product 1", new BigDecimal(10.00)));
+							    cart.add(new Product("PROD-002", "Product 2", new BigDecimal(5.00)));
+									ShippingAddress shippingAddress = new ShippingAddress("Daniel Aquino", "1234 Test Street", "", "Nashville", "TN", "37217");
 
 							    //when
 							    Order order = orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
 
 							    //then
-							    //....omitted
-							    Assert.assertEquals(expectedTax, new BigDecimal(0.93).setScale(2, BigDecimal.ROUND_HALF_UP));
+							    assertEquals(new BigDecimal(15.00), order.getSubtotal());
+							    assertEquals(new BigDecimal(1.50), order.getTax());
+							    assertEquals(new BigDecimal(16.50), order.getTotal());
 							}
 						</code></pre>
 					</section>
@@ -253,7 +236,7 @@
 						<h3>Spy</h3>
 						<p>Record information on how they were called.</p>
 						<pre><code class="java" style="font-size: 18px" data-trim contenteditable>
-							private class SpyOrderRepository implements OrderRepository {
+							private class OrderRepositorySpy implements OrderRepository {
 							    private Order order;
 
 							    public SpyOrderRepository() {
@@ -269,17 +252,11 @@
 							    }
 							}
 
-							@Before
-							public void setUp() {
-							    //....omitted
-							    orderRepository = new SpyOrderRepository();
-							    orderRegister = new OrderRegister(orderRepository, taxCalculator);
-							    //....omitted
-							}
-
 							@Test
 							public void placedOrderIsPersisted() {
 							    //given omitted
+									OrderRepository orderRepository = new OrderRepositorySpy()
+									OrderRegister = new OrderRegister(orderRepository, new FakeTaxCalculator());
 
 							    //when
 							    orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
@@ -294,17 +271,16 @@
 						<h3>Mock</h3>
 						<p>Pre-programmed with expectations of calls they should receive</p>
 						<pre><code class="java" style="font-size: 18px" data-trim contenteditable>
-							@Before
-							public void setUp() {
-							    orderRepository = Mockito.mock(OrderRepository.class);
-							    taxCalculator = Mockito.mock(SalesTaxDeterminer.class);
-							    orderRegister = new OrderRegister(orderRepository, taxCalculator);
-							}
-
 							@Test
 							public void placedOrderIsPersisted() {
 							    //given
-							    cart.add(nomProduct);
+							    OrderRepository orderRepository = Mockito.mock(OrderRepository.class);
+							    TaxCalculator taxCalculator = Mockito.mock(TaxCalculator.class);
+							    OrderRegister = orderRegister = new OrderRegister(orderRepository, taxCalculator);
+							    ShoppingCart cart = new ShoppingCart();
+							    cart.add(new Product("PROD-001", "Product 1", new BigDecimal(10.00)));
+							    ShippingAddress shippingAddress = new ShippingAddress("Daniel Aquino", "1234 Test Street", "", "Nashville", "TN", "37217");
+							    Mockito.when(taxCalculator.calculate(Mockito.any(BigDecimal.class), Mockito.any(String.class))).thenReturn(new BigDecimal(0));
 
 							    //when
 							    orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
@@ -319,14 +295,84 @@
 					<section>
 						<h3>Integration Tests</h3>
 					</section>
+					<section>
+						<h3>Order Repository example</h3>
+						<pre><code class="java" style="font-size: 18px" data-trim contenteditable>
+							private static class RelationalInstance {
+							    private DataSource dataSource;
+
+							    public RelationalInstance(final Path ddlPath) throws SQLException {
+							        RunScript.execute("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "sa", "",
+							                ddlPath.toString(), Charset.forName("UTF-8"), false);
+							        dataSource = new DataSource();
+							        dataSource.setUrl("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
+							        dataSource.setUsername("sa");
+							        dataSource.setPassword("");
+							        dataSource.setDriverClassName("org.h2.Driver");
+							    }
+
+							    public DataSource getDataSource() {
+							        return dataSource;
+							    }
+							}
+
+							@BeforeClass
+					    public static void setupClass() throws SQLException {
+					        instance = new RelationalInstance(Paths.get(System.getProperty("sql.schema.path")));
+					    }
+
+							@Test
+							public void canSave() throws SQLException {
+							    //given
+							    OrderRepository orderRepository = new JdbcOrderRepository(instance.getDataSource());
+							    Product product = new Product("PROD-1", "Product 1", new BigDecimal(10.00));
+							    List&lt;LineItem&gt; items = new ArrayList&lt;&gt;();
+							    items.add(new LineItem(product, 1));
+							    ShippingAddress shippingAddress = new ShippingAddress("Daniel Aquino", "1234 Test Street",
+							            "Suite 100", "Nashville", "TN", "37013");
+							    Order order = new Order("12345", new BigDecimal(10.00), new BigDecimal(1.00), new BigDecimal(11.00), "daniel.j.aquino@gmail.com",
+							            shippingAddress, items);
+
+							    //when
+							    orderRepository.save(order);
+
+							    //then
+							    assertOrderDetails(order);
+							    assertOrderItems(order);
+							}
+
+							private void assertOrderDetails(final Order order) {
+							    try (Connection connection = instance.getDataSource().getConnection();
+							         PreparedStatement statement = connection.prepareStatement("select * from \"order\" limit 1")) {
+							        ResultSet resultSet = statement.executeQuery();
+							        if(resultSet.next()) {
+							            Assert.assertEquals(order.getOrderId(), resultSet.getString(1));
+							            Assert.assertEquals(order.getSubtotal(), resultSet.getBigDecimal(2));
+							            Assert.assertEquals(order.getTax(), resultSet.getBigDecimal(3));
+							            Assert.assertEquals(order.getTotal(), resultSet.getBigDecimal(4));
+							            Assert.assertEquals(order.getUserId(), resultSet.getString(5));
+							            Assert.assertEquals(order.getShippingAddressTo(), resultSet.getString(6));
+							            Assert.assertEquals(order.getShippingAddressLineOne(), resultSet.getString(7));
+							            Assert.assertEquals(order.getShippingAddressLineTwo(), resultSet.getString(8));
+							            Assert.assertEquals(order.getShippingAddressCity(), resultSet.getString(9));
+							            Assert.assertEquals(order.getShippingAddressState(), resultSet.getString(10));
+							            Assert.assertEquals(order.getShippingAddressZip(), resultSet.getString(11));
+							        }
+							        else {
+							            Assert.fail("Should have results");
+							        }
+							        statement.close();
+							    } catch (SQLException e) {
+							        throw new RuntimeException(e);
+							    }
+							}
+						</code></pre>
+					</section>
 				</section>
 				<section>
 					<section>
 						<h3>Test Driven Development</h3>
 					</section>
-				</section>
-				<section>
-					<h3>Shopping cart example</h3>
 				</section>
 				<section>
 					<h3>Open discussion</h3>

@@ -96,7 +96,7 @@ public class OrderRegisterTest {
     @Test
     public void placedOrderIsPersisted() {
         //given
-        Mockito.when(taxCalculator.calculate(any(BigDecimal.class), any(String.class))).thenReturn(new BigDecimal(0));
+        Mockito.when(taxCalculator.calculate(Mockito.any(BigDecimal.class), Mockito.any(String.class))).thenReturn(new BigDecimal(0));
         cart.add(nomProduct);
 
         //when
