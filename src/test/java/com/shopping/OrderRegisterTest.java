@@ -23,7 +23,7 @@ public class OrderRegisterTest {
     @Before
     public void setUp() {
         orderRepository = Mockito.mock(OrderRepository.class);
-        taxCalculator = Mockito.mock(TaxCalculator.class);
+        taxCalculator = new StubTaxCalculator(new BigDecimal(10));
         orderRegister = new OrderRegister(orderRepository, taxCalculator);
         cart = new ShoppingCart();
         nomProduct = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
@@ -43,11 +43,10 @@ public class OrderRegisterTest {
         //given
         setupMultiItemCart();
         BigDecimal expectedSubtotal = new BigDecimal(94.74).setScale(2, RoundingMode.HALF_UP);
-        BigDecimal expectedTax = new BigDecimal(8.76).setScale(2, RoundingMode.HALF_UP);
-        BigDecimal expectedTotal = new BigDecimal(103.50).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal expectedTax = new BigDecimal(10).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal expectedTotal = new BigDecimal(104.74).setScale(2, RoundingMode.HALF_UP);
         LineItem expectedNomItem = new LineItem(nomProduct, 3);
         LineItem expectedPonyItem = new LineItem(ponyProduct, 3);
-        Mockito.when(taxCalculator.calculate(expectedSubtotal, shippingAddress.getState())).thenReturn(expectedTax);
 
         //when
         Order order = orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
@@ -104,5 +103,18 @@ public class OrderRegisterTest {
 
         //then
         Mockito.verify(orderRepository).save(any(Order.class));
+    }
+
+    private static class StubTaxCalculator implements TaxCalculator {
+        private final BigDecimal tax;
+
+        public StubTaxCalculator(final BigDecimal tax) {
+            this.tax = tax.setScale(2, BigDecimal.ROUND_HALF_UP);
+        }
+
+        @Override
+        public BigDecimal calculate(final BigDecimal subtotal, final String state) {
+            return tax;
+        }
     }
 }
