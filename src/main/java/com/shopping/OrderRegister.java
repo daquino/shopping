@@ -6,27 +6,22 @@ import java.util.UUID;
 
 public class OrderRegister {
     private final OrderRepository orderRepository;
-    private final SalesTaxDeterminer salesTaxDeterminer;
+    private final TaxCalculator taxCalculator;
 
-    public OrderRegister(final OrderRepository orderRepository, final SalesTaxDeterminer salesTaxDeterminer) {
+    public OrderRegister(final OrderRepository orderRepository, final TaxCalculator taxCalculator) {
         this.orderRepository = orderRepository;
-        this.salesTaxDeterminer = salesTaxDeterminer;
+        this.taxCalculator = taxCalculator;
     }
 
     public Order placeOrder(final ShoppingCart cart,
                             final String userId,
                             final ShippingAddress shippingAddress) {
         BigDecimal subtotal = cart.getSubtotal();
-        BigDecimal tax = calculateTax(subtotal, shippingAddress.getState());
+        BigDecimal tax = taxCalculator.calculate(subtotal, shippingAddress.getState());
         Order order = new Order(generateOrderId(), subtotal, tax, calculateTotal(subtotal, tax),
                 userId, shippingAddress, cart.getLineItems());
         orderRepository.save(order);
         return order;
-    }
-
-    private BigDecimal calculateTax(final BigDecimal subtotal, final String state) {
-        float taxPercentage = salesTaxDeterminer.determineSalesTax(state);
-        return subtotal.multiply(BigDecimal.valueOf(taxPercentage)).setScale(2, RoundingMode.HALF_UP);
     }
 
     private String generateOrderId() {

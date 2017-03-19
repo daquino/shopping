@@ -96,7 +96,7 @@
 						<h3>Unit Test Structure</h3>
 						<ul>
 							<li>Setup state</li>
-							<li>Perform some action</li>
+							<li>Perform action you want to test</li>
 							<li>Verify result</li>
 						</ul>
 					</section>
@@ -104,26 +104,22 @@
 						<h3>JUnit Example</h3>
 						<pre><code class="java" style="font-size: 18px" data-trim contenteditable>
 							@Test
-							public void canAddItems() {
-							    //given
-							    ShoppingCart cart = new ShoppingCart();
-							    Product nomProduct = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
-							    Product ponyProduct = new Product("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
-							            new BigDecimal(21.99));
-							    BigDecimal expectedSubtotal = new BigDecimal(31.58).setScale(2, BigDecimal.ROUND_HALF_UP);
-							    LineItem firstExpectedItem = new LineItem(nomProduct, 1);
-							    LineItem secondExpectedItem = new LineItem(ponyProduct, 1);
+							public void canAddASingleItem() {
+					        //given
+					        ShoppingCart cart = new ShoppingCart();
+					        Product product = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
+					        LineItem expectedLineItem = new TestLineItem("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", 1,
+					                new BigDecimal(9.59).setScale(2, BigDecimal.ROUND_HALF_UP));
 
-							    //when
-							    cart.add(nomProduct);
-							    cart.add(ponyProduct);
+					        //when
+					        cart.add(product);
 
-							    //then
-							    Assert.assertEquals(2, cart.getItemCount());
-							    Assert.assertEquals(expectedSubtotal, cart.getSubtotal());
-							    assertLineEntry(firstExpectedItem, cart.getLineItems().get(0));
-							    assertLineEntry(secondExpectedItem, cart.getLineItems().get(1));
-							}
+					        //then
+					        Assert.assertEquals(1, cart.getItemCount());
+					        Assert.assertEquals(new BigDecimal(9.59).setScale(2, BigDecimal.ROUND_HALF_UP), cart.getSubtotal());
+					        assertLineEntry(expectedLineItem, cart.getLineItems().get(0));
+
+					    }
 
 							private void assertLineEntry(final LineItem expectedItem, final LineItem actualItem) {
 							    Assert.assertEquals(expectedItem.getSku(), actualItem.getSku());
@@ -150,7 +146,7 @@
 					</section>
 					<section>
 						<h3>Dummy</h3>
-						<p>Passed around but never used</p>
+						<p>Passed around but never used  </p>
 						<pre><code class="java" style="font-size: 18px" data-trim contenteditable>
 							@Before
 							public void setUp() {
@@ -193,8 +189,8 @@
 							@Before
 							public void setUp() {
 							    //....omitted
-							    salesTaxDeterminer = new FakeSalesTaxDeterminer();
-							    orderRegister = new OrderRegister(orderRepository, salesTaxDeterminer);
+							    taxCalculator = new FakeSalesTaxDeterminer();
+							    orderRegister = new OrderRegister(orderRepository, taxCalculator);
 							    //....omitted
 							}
 
@@ -233,8 +229,8 @@
 							@Before
 							public void setUp() {
 							    //....omitted
-							    salesTaxDeterminer = new FakeSalesTaxDeterminer(0.0925);
-							    orderRegister = new OrderRegister(orderRepository, salesTaxDeterminer);
+							    taxCalculator = new FakeSalesTaxDeterminer(0.0925);
+							    orderRegister = new OrderRegister(orderRepository, taxCalculator);
 							    //....omitted
 							}
 
@@ -277,7 +273,7 @@
 							public void setUp() {
 							    //....omitted
 							    orderRepository = new SpyOrderRepository();
-							    orderRegister = new OrderRegister(orderRepository, salesTaxDeterminer);
+							    orderRegister = new OrderRegister(orderRepository, taxCalculator);
 							    //....omitted
 							}
 
@@ -301,8 +297,8 @@
 							@Before
 							public void setUp() {
 							    orderRepository = Mockito.mock(OrderRepository.class);
-							    salesTaxDeterminer = Mockito.mock(SalesTaxDeterminer.class);
-							    orderRegister = new OrderRegister(orderRepository, salesTaxDeterminer);
+							    taxCalculator = Mockito.mock(SalesTaxDeterminer.class);
+							    orderRegister = new OrderRegister(orderRepository, taxCalculator);
 							}
 
 							@Test
