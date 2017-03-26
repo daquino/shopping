@@ -52,7 +52,7 @@
 					<section>
 						<h3>Why do we test?</h3>
 						<ul>
-							<li class="fragment">Validate that our code follows behavior that our clients expect</li>
+							<li class="fragment">Validate that our code follows defined behavior</li>
 							<li class="fragment">Prevent regression when code changes</li>
 						</ul>
 					</section>
@@ -367,6 +367,9 @@
 						<h3>Test Driven Development</h3>
 					</section>
 					<section>
+						<img src="images/rgf.jpg" alt="Red Green Refactor"/>
+					</section>
+					<section>
 						<h3>Red</h3>
 						<img src="images/red.png" alt="red"/>
 					</section>
@@ -396,6 +399,11 @@
 						<img src="images/pass2.png" alt="Pass2" style="height:500px;"/>
 					</section>
 					<section>
+						<h3>Green - Test</h3>
+						<img src="images/failing.png" alt="Test"/>
+						<img src="images/pass3.png"/ alt="Test passes">
+					</section>
+					<section>
 						<h3>Didn't have a refactor step for that test but...<h3>
 					</section>
 					<section>
@@ -406,11 +414,30 @@
 						<h3>Refactor - Same item change<h3>
 							<img src="images/cart_design_refactor.png" alt="Same item"/>
 					</section>
-					<section>
-						<h3>Green - Test</h3>
-						<img src="images/failing.png" alt="Test"/>
-						<img src="images/pass3.png"/ alt="Test passes">
-					</section>
+				</section>
+				<section>
+					<h3>Pros/Cons</h3>
+					<ul>
+						<li class="fragment">Pros
+							<ul>
+								<li class="fragment">Shorter feetback loop</li>
+								<li class="fragment">Less mistakes made if run multiple times.</li>
+								<li class="fragment">Helps with refactoring</li>
+								<li class="fragment">Automated regression tests</li>
+							</ul>
+						</li>
+						<li class="fragment">Cons
+							<ul>
+								<li class="fragment">Upfront cost to develop</li>
+								<li class="fragment">Cost to maintain</li>
+								<li class="fragment">Less flexible (i.e. password reset workflow test)</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Sample code</h3>
+					<p>https://github.com/daquino/shopping</p>
 				</section>
 				<section>
 					<h3>Open discussion</h3>
