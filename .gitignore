@@ -10,6 +10,8 @@
 .idea/**
 .idea/**/workspace.xml
 .idea/**/tasks.xml
+.DS_Store
+**/images/**
 
 # Sensitive or high-churn files:
 .idea/**/dataSources/
