@@ -10,16 +10,17 @@ public class ShoppingCartTest {
     public void canAddASingleItem() {
         //given
         ShoppingCart cart = new ShoppingCart();
-        Product product = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
+        BigDecimal price = new BigDecimal(9.59).setScale(2, BigDecimal.ROUND_HALF_UP);
+        Product product = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", price);
         LineItem expectedLineItem = new TestLineItem("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", 1,
-                new BigDecimal(9.59).setScale(2, BigDecimal.ROUND_HALF_UP));
+                price);
 
         //when
         cart.add(product);
 
         //then
         Assert.assertEquals(1, cart.getItemCount());
-        Assert.assertEquals(new BigDecimal(9.59).setScale(2, BigDecimal.ROUND_HALF_UP), cart.getSubtotal());
+        Assert.assertEquals(price, cart.getSubtotal());
         assertLineEntry(expectedLineItem, cart.getLineItems().get(0));
 
     }
