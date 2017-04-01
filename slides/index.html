@@ -50,7 +50,7 @@
 				</section>
 				<section>
 					<ul>
-						<li class="fragment">Who has written unit/integration tests?</li>
+						<li>Who has written unit/integration tests?</li>
 						<li class="fragment">Who has done TDD?</li>
 						<li class="fragment">Who still does the above?</li>
 					</ul>
@@ -119,7 +119,7 @@
 					        //then
 					        Assert.assertEquals(1, cart.getItemCount());
 					        Assert.assertEquals(new BigDecimal(10.00), cart.getSubtotal());
-					        assertLineEntry(new LineItem("PROD-1", "Product 1", 1, new BigDecimal(10.00), cart.getLineItems().get(0));
+					        assertLineEntry(new TestLineItem("PROD-1", "Product 1", 1, new BigDecimal(10.00)), cart.getLineItems().get(0));
 					    }
 
 							private void assertLineEntry(final LineItem expectedItem, final LineItem actualItem) {
@@ -181,7 +181,7 @@
 							    ShoppingCart cart = new ShoppingCart();
 							    cart.add(new Product("PROD-001", "Product 1", new BigDecimal(10.00)));
 							    cart.add(new Product("PROD-002", "Product 2", new BigDecimal(5.00)));
-									ShippingAddress shippingAddress = new ShippingAddress("Daniel Aquino", "1234 Test Street", "", "Nashville", "TN", "37217");
+							    ShippingAddress shippingAddress = new ShippingAddress("Daniel Aquino", "1234 Test Street", "", "Nashville", "TN", "37217");
 
 							    //when
 							    Order order = orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
@@ -217,7 +217,7 @@
 							    ShoppingCart cart = new ShoppingCart();
 							    cart.add(new Product("PROD-001", "Product 1", new BigDecimal(10.00)));
 							    cart.add(new Product("PROD-002", "Product 2", new BigDecimal(5.00)));
-									ShippingAddress shippingAddress = new ShippingAddress("Daniel Aquino", "1234 Test Street", "", "Nashville", "TN", "37217");
+							    ShippingAddress shippingAddress = new ShippingAddress("Daniel Aquino", "1234 Test Street", "", "Nashville", "TN", "37217");
 
 							    //when
 							    Order order = orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
@@ -252,14 +252,14 @@
 							@Test
 							public void placedOrderIsPersisted() {
 							    //given omitted
-									OrderRepository orderRepository = new OrderRepositorySpy()
-									OrderRegister = new OrderRegister(orderRepository, new FakeTaxCalculator());
+						      OrderRepositorySpy orderRepositorySpy = new OrderRepositorySpy()
+						      OrderRegister = new OrderRegister(orderRepositorySpy, new FakeTaxCalculator());
 
 							    //when
 							    orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
 
 							    //then
-							    Order savedOrder = orderRepository.getOrder();
+							    Order savedOrder = orderRepositorySpy.getOrder();
 							    Assert.assertEquals("daniel.j.aquino@gmail.com", savedOrder.getUserId());
 							}
 						</code></pre>
@@ -314,12 +314,21 @@
 							    public DataSource getDataSource() {
 							        return dataSource;
 							    }
+
+							    public void cleanup() {
+							        RunScript.execute(dataSource.getConnection(), new StringReader("drop all objects"));
+							    }
 							}
 
 							@BeforeClass
-					    public static void setupClass() throws SQLException {
-					        instance = new RelationalInstance(Paths.get(System.getProperty("sql.schema.path")));
-					    }
+							public static void setupClass() throws SQLException {
+							    instance = new RelationalInstance(Paths.get(System.getProperty("sql.schema.path")));
+							}
+
+							@After
+							public void tearDown() {
+							    instance.cleanup();
+							}
 
 							@Test
 							public void canSave() throws SQLException {
@@ -411,7 +420,15 @@
 						<img src="images/pass3.png"/ alt="Test passes">
 					</section>
 					<section>
-						<h3>Didn't have a refactor step for that test but...<h3>
+						<h3>Green - Refactor</h3>
+						<img src="images/single_item_refactor.png" alt="Refactor"/>
+					</section>
+					<section>
+						<h3>Better example for refactoring</h3>
+					</section>
+					<section>
+						<h3>Same item test</h3>
+						<img src="images/same_item_test.png" alt="same item test"/>
 					</section>
 					<section>
 						<h3>Refactor - Same item<h3>
@@ -427,7 +444,7 @@
 					<ul>
 						<li class="fragment">Pros
 							<ul>
-								<li class="fragment">Shorter feetback loop</li>
+								<li class="fragment">Shorter feedback loop</li>
 								<li class="fragment">Less mistakes made if run multiple times.</li>
 								<li class="fragment">Helps with refactoring</li>
 								<li class="fragment">Automated regression tests</li>
