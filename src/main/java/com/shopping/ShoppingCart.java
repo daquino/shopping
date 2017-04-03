@@ -1,20 +1,31 @@
 package com.shopping;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class ShoppingCart {
-    public void add(final Product product) {
+    private final List<LineItem> lineItems;
 
+    public ShoppingCart() {
+        this.lineItems = new ArrayList<>();
+    }
+
+    public void add(final Product product) {
+        lineItems.add(new LineItem(product.getSku(), product.getName(), product.getPrice(), 1));
     }
 
     public int getItemCount() {
-        return 1;
+        return lineItems.size();
     }
 
     public BigDecimal getSubtotal() {
-        return new BigDecimal(9.59).setScale(2, BigDecimal.ROUND_HALF_UP);
+        BigDecimal subtotal = BigDecimal.ZERO;
+        for(LineItem item: lineItems) {
+            subtotal = subtotal.add(item.getCost());
+        }
+        return subtotal;
     }
 
     public List<LineItem> getLineItems() {

@@ -30,4 +30,8 @@ public class LineItem {
     public int getQuantity() {
         return quantity;
     }
+
+    public BigDecimal getCost() {
+        return price.multiply(new BigDecimal(quantity)).setScale(2, BigDecimal.ROUND_HALF_UP);
+    }
 }
