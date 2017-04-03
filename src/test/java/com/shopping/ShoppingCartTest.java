@@ -28,6 +28,6 @@ public class ShoppingCartTest {
         Assert.assertEquals(expectedItem.getSku(), actalItem.getSku());
         Assert.assertEquals(expectedItem.getName(), actalItem.getName());
         Assert.assertEquals(expectedItem.getQuantity(), actalItem.getQuantity());
-        Assert.assertEquals(expectedItem.getCost(), actalItem.getCost());
+        Assert.assertEquals(expectedItem.getPrice(), actalItem.getPrice());
     }
 }
