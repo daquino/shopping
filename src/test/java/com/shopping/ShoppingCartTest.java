@@ -10,7 +10,8 @@ public class ShoppingCartTest {
     public void canAddASingleItem() {
         //given
         ShoppingCart cart = new ShoppingCart();
-        Product product = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset", new BigDecimal(9.59));
+        Product product = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset",
+                new BigDecimal(9.59).setScale(2, BigDecimal.ROUND_HALF_UP));
         LineItem expectedLineItem = new LineItem(product, 1);
 
         //when
