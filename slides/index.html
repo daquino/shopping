@@ -94,9 +94,6 @@
 						<img src="images/shopping_cart_unit.png" alt="Shopping cart start"/>
 					</section>
 					<section>
-						<img src="images/multi_class_unit.png" alt="Multi class unit example"/>
-					</section>
-					<section>
 						<h3>Unit Test Structure</h3>
 						<ul>
 							<li>Setup state</li>
@@ -106,29 +103,7 @@
 					</section>
 					<section>
 						<h3>JUnit Example</h3>
-						<pre><code class="java" style="font-size: 18px" data-trim contenteditable>
-							@Test
-							public void canAddASingleItem() {
-					        //given
-					        ShoppingCart cart = new ShoppingCart();
-					        Product product = new Product("PROD-1", "Product 1", new BigDecimal(10.00));
-
-					        //when
-					        cart.add(product);
-
-					        //then
-					        Assert.assertEquals(1, cart.getItemCount());
-					        Assert.assertEquals(new BigDecimal(10.00), cart.getSubtotal());
-					        assertLineEntry(new TestLineItem("PROD-1", "Product 1", 1, new BigDecimal(10.00)), cart.getLineItems().get(0));
-					    }
-
-							private void assertLineEntry(final LineItem expectedItem, final LineItem actualItem) {
-							    Assert.assertEquals(expectedItem.getSku(), actualItem.getSku());
-							    Assert.assertEquals(expectedItem.getName(), actualItem.getName());
-							    Assert.assertEquals(expectedItem.getQuantity(), actualItem.getQuantity());
-							    Assert.assertEquals(expectedItem.getPrice(), actualItem.getPrice());
-							}
-						</code></pre>
+						<img src="images/tdd_cart_test.png" alt="Test"/>
 					</section>
 				</section>
 				<section>
@@ -296,86 +271,13 @@
 						<h3>Integration Tests</h3>
 					</section>
 					<section>
-						<h3>Order Repository example</h3>
-						<pre><code class="java" style="font-size: 18px" data-trim contenteditable>
-							private static class RelationalInstance {
-							    private DataSource dataSource;
-
-							    public RelationalInstance(final Path ddlPath) throws SQLException {
-							        RunScript.execute("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "sa", "",
-							                ddlPath.toString(), Charset.forName("UTF-8"), false);
-							        dataSource = new DataSource();
-							        dataSource.setUrl("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
-							        dataSource.setUsername("sa");
-							        dataSource.setPassword("");
-							        dataSource.setDriverClassName("org.h2.Driver");
-							    }
-
-							    public DataSource getDataSource() {
-							        return dataSource;
-							    }
-
-							    public void cleanup() {
-							        RunScript.execute(dataSource.getConnection(), new StringReader("drop all objects"));
-							    }
-							}
-
-							@BeforeClass
-							public static void setupClass() throws SQLException {
-							    instance = new RelationalInstance(Paths.get(System.getProperty("sql.schema.path")));
-							}
-
-							@After
-							public void tearDown() {
-							    instance.cleanup();
-							}
-
-							@Test
-							public void canSave() throws SQLException {
-							    //given
-							    OrderRepository orderRepository = new JdbcOrderRepository(instance.getDataSource());
-							    Product product = new Product("PROD-1", "Product 1", new BigDecimal(10.00));
-							    List&lt;LineItem&gt; items = new ArrayList&lt;&gt;();
-							    items.add(new LineItem(product, 1));
-							    ShippingAddress shippingAddress = new ShippingAddress("Daniel Aquino", "1234 Test Street",
-							            "Suite 100", "Nashville", "TN", "37013");
-							    Order order = new Order("12345", new BigDecimal(10.00), new BigDecimal(1.00), new BigDecimal(11.00), "daniel.j.aquino@gmail.com",
-							            shippingAddress, items);
-
-							    //when
-							    orderRepository.save(order);
-
-							    //then
-							    assertOrderDetails(order);
-							    assertOrderItems(order);
-							}
-
-							private void assertOrderDetails(final Order order) {
-							    try (Connection connection = instance.getDataSource().getConnection();
-							         PreparedStatement statement = connection.prepareStatement("select * from \"order\" limit 1")) {
-							        ResultSet resultSet = statement.executeQuery();
-							        if(resultSet.next()) {
-							            Assert.assertEquals(order.getOrderId(), resultSet.getString(1));
-							            Assert.assertEquals(order.getSubtotal(), resultSet.getBigDecimal(2));
-							            Assert.assertEquals(order.getTax(), resultSet.getBigDecimal(3));
-							            Assert.assertEquals(order.getTotal(), resultSet.getBigDecimal(4));
-							            Assert.assertEquals(order.getUserId(), resultSet.getString(5));
-							            Assert.assertEquals(order.getShippingAddressTo(), resultSet.getString(6));
-							            Assert.assertEquals(order.getShippingAddressLineOne(), resultSet.getString(7));
-							            Assert.assertEquals(order.getShippingAddressLineTwo(), resultSet.getString(8));
-							            Assert.assertEquals(order.getShippingAddressCity(), resultSet.getString(9));
-							            Assert.assertEquals(order.getShippingAddressState(), resultSet.getString(10));
-							            Assert.assertEquals(order.getShippingAddressZip(), resultSet.getString(11));
-							        }
-							        else {
-							            Assert.fail("Should have results");
-							        }
-							        statement.close();
-							    } catch (SQLException e) {
-							        throw new RuntimeException(e);
-							    }
-							}
-						</code></pre>
+						<img src="images/integration_test.png" alt="integration test" style="height: 650px;"/>
+					</section>
+					<section>
+						<img src="images/assert_order_details.png" alt="assertion"/>
+					</section>
+					<section>
+						<img src="images/relational_instance.png" alt="relational instance"/>
 					</section>
 				</section>
 				<section>
@@ -387,58 +289,43 @@
 					</section>
 					<section>
 						<h3>Red</h3>
-						<img src="images/red.png" alt="red"/>
+						<img src="images/tdd_red.png" alt="red"/>
 					</section>
 					<section>
 						<h3>Red - Shopping cart</h3>
-						<img src="images/shopping_cart.png" alt="red"/>
+						<img src="images/tdd_cart_fail.png" alt="red"/>
 					</section>
 					<section>
 						<h3>Red - Product</h3>
-						<img src="images/product.png" alt="product"/>
+						<img src="images/tdd_product.png" alt="product"/>
 					</section>
 					<section>
 						<h3>Red - Line Item</h3>
-						<img src="images/line_item.png" alt="Line Item"/>
+						<img src="images/tdd_line_item.png" alt="Line Item"/>
 					</section>
 					<section>
 						<h3>Red - Test</h3>
-						<img src="images/failing.png" alt="Failing"/>
-						<img src="images/assert_fail.png" alt="assert fail"/>
+						<img src="images/tdd_cart_test.png" alt="Failing" style="height: 375px;"/>
+						<img src="images/tdd_test_fail.png" alt="assert fail"/>
 					</section>
 					<section>
 						<h3>Green - Shopping Cart </h3>
-						<img src="images/pass1.png" alt="Pass1" style="height:500px;"/>
-					</section>
-					<section>
-						<h3>Green - Shopping Cart</h3>
-						<img src="images/pass2.png" alt="Pass2" style="height:500px;"/>
+						<img src="images/tdd_cart_pass.png" alt="Pass1"/>
 					</section>
 					<section>
 						<h3>Green - Test</h3>
-						<img src="images/failing.png" alt="Test"/>
-						<img src="images/pass3.png"/ alt="Test passes">
+						<img src="images/tdd_cart_test.png" alt="Test" style="height: 375px;"/>
+						<img src="images/tdd_test_pass.png"/ alt="Test passes">
 					</section>
 					<section>
 						<h3>Green - Refactor</h3>
-						<img src="images/single_item_refactor.png" alt="Refactor"/>
+						<img src="images/tdd_cart_refactor.png" alt="Refactor" style="height: 550px;"/>
 					</section>
 					<section>
-						<h3>Better example for refactoring</h3>
+						<h3>Green - Refactor</h3>
+						<img src="images/tdd_cart_test.png" alt="Test" style="height: 375px;"/>
+						<img src="images/tdd_refactor_pass.png"/ alt="Test passes">
 					</section>
-					<section>
-						<h3>Same item test</h3>
-						<img src="images/same_item_test.png" alt="same item test"/>
-					</section>
-					<section>
-						<h3>Refactor - Same item<h3>
-							<img src="images/cart_same_item.png" alt="Same item"/>
-					</section>
-					<section>
-						<h3>Refactor - Same item change<h3>
-							<img src="images/cart_design_refactor.png" alt="Same item"/>
-					</section>
-				</section>
 				<section>
 					<h3>Pros/Cons</h3>
 					<ul>

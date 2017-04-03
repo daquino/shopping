@@ -4,7 +4,7 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 import org.h2.tools.RunScript;
 import org.junit.*;
 
-import javax.management.relation.Relation;
+import java.io.StringReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcOrderRepositoryITCase {
+
     private JdbcOrderRepository orderRepository;
     private static RelationalInstance instance;
 
@@ -26,9 +27,9 @@ public class JdbcOrderRepositoryITCase {
         instance = new RelationalInstance(Paths.get(System.getProperty("sql.schema.path")));
     }
 
-    @AfterClass
-    public static void teardownClass() {
-        instance = null;
+    @After
+    public static void tearDown() throws SQLException {
+        instance.cleanup();
     }
 
     @Before
@@ -40,7 +41,7 @@ public class JdbcOrderRepositoryITCase {
     public void canSave() throws SQLException {
         //given
         RelationalInstance instance = new RelationalInstance(Paths.get(System.getProperty("sql.schema.path")));
-        OrderRepository orderRepository = new JdbcOrderRepository(instance.getDataSource());
+        orderRepository = new JdbcOrderRepository(instance.getDataSource());
         Product ponyProduct = new Product("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
                 new BigDecimal(21.99));
         BigDecimal subtotal = new BigDecimal(21.99).setScale(2, RoundingMode.HALF_UP);
@@ -91,7 +92,7 @@ public class JdbcOrderRepositoryITCase {
         try (Connection connection = instance.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement("select * from \"order\" limit 1")) {
             ResultSet resultSet = statement.executeQuery();
-            if(resultSet.next()) {
+            if (resultSet.next()) {
                 Assert.assertEquals(order.getOrderId(), resultSet.getString(1));
                 Assert.assertEquals(order.getSubtotal(), resultSet.getBigDecimal(2));
                 Assert.assertEquals(order.getTax(), resultSet.getBigDecimal(3));
@@ -117,7 +118,7 @@ public class JdbcOrderRepositoryITCase {
         try (Connection connection = instance.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement("select * from order_item")) {
             ResultSet resultSet = statement.executeQuery();
-            for(LineItem item: order.getItems()) {
+            for (LineItem item : order.getItems()) {
                 if (resultSet.next()) {
                     Assert.assertEquals(order.getOrderId(), resultSet.getString(1));
                     Assert.assertEquals(item.getSku(), resultSet.getString(2));
@@ -151,5 +152,10 @@ public class JdbcOrderRepositoryITCase {
         public DataSource getDataSource() {
             return dataSource;
         }
+
+        public void cleanup() throws SQLException {
+            RunScript.execute(dataSource.getConnection(), new StringReader("drop all objects"));
+        }
     }
+
 }
