@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.math.BigDecimal;
 
 public class ShoppingCartTest {
+
     @Test
     public void canAddASingleItem() {
         //given
@@ -30,4 +31,5 @@ public class ShoppingCartTest {
         Assert.assertEquals(expectedItem.getQuantity(), actalItem.getQuantity());
         Assert.assertEquals(expectedItem.getPrice(), actalItem.getPrice());
     }
+
 }
