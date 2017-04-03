@@ -3,28 +3,24 @@ package com.shopping;
 import java.math.BigDecimal;
 
 public class LineItem {
-    private final String sku;
-    private final String name;
-    private final BigDecimal price;
+    private final Product product;
     private final int quantity;
 
-    public LineItem(final String sku, final String name, final BigDecimal price, final int quantity) {
-        this.sku = sku;
-        this.name = name;
-        this.price = price;
+    public LineItem(final Product product, final int quantity) {
+        this.product = product;
         this.quantity = quantity;
     }
 
     public String getSku() {
-        return sku;
+        return product.getSku();
     }
 
     public String getName() {
-        return name;
+        return product.getName();
     }
 
     public BigDecimal getPrice() {
-        return price;
+        return product.getPrice();
     }
 
     public int getQuantity() {
