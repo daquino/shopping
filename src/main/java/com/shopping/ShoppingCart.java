@@ -18,8 +18,9 @@ public class ShoppingCart {
     }
 
     public List<LineItem> getLineItems() {
-        LineItem item = new LineItem("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset",
-                new BigDecimal(9.59).setScale(2, BigDecimal.ROUND_HALF_UP), 1);
+        Product product = new Product("A71243E2", "Num Noms Series 2 Sparkle Cupcake Playset",
+                new BigDecimal(9.59).setScale(2, BigDecimal.ROUND_HALF_UP));
+        LineItem item = new LineItem(product, 1);
         return Arrays.asList(item);
     }
 }
