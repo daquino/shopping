@@ -25,11 +25,11 @@ public class ShoppingCartTest {
 
     }
 
-    private void assertLineEntry(final LineItem expectedItem, final LineItem actalItem) {
-        Assert.assertEquals(expectedItem.getSku(), actalItem.getSku());
-        Assert.assertEquals(expectedItem.getName(), actalItem.getName());
-        Assert.assertEquals(expectedItem.getQuantity(), actalItem.getQuantity());
-        Assert.assertEquals(expectedItem.getPrice(), actalItem.getPrice());
+    private void assertLineEntry(final LineItem expectedItem, final LineItem actualItem) {
+        Assert.assertEquals(expectedItem.getSku(), actualItem.getSku());
+        Assert.assertEquals(expectedItem.getName(), actualItem.getName());
+        Assert.assertEquals(expectedItem.getQuantity(), actualItem.getQuantity());
+        Assert.assertEquals(expectedItem.getPrice(), actualItem.getPrice());
     }
 
 }
