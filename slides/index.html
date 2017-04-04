@@ -30,8 +30,7 @@
 				<section>
 					<h3>Agenda</h3>
 					<ul>
-						<li>Talk about why we test in general</li>
-						<li>Discuss two main approaches to testing</li>
+						<li>Why and How</li>
 						<li>Unit Tests</li>
 						<li>Test Doubles (i.e. "Mocks")</li>
 						<li>Integration Testing</li>
@@ -115,152 +114,23 @@
 					</section>
 					<section>
 						<h3>Dummy</h3>
-						<p>Passed around but never used  </p>
-						<pre><code class="java" style="font-size: 18px" data-trim contenteditable>
-							@Before
-							public void setUp() {
-							    //....omitted
-							    orderRegister = new OrderRegister(null, null);
-							    //....omitted
-							}
-
-							@Test
-							public void canPlaceOrder() {
-							    //given
-							    //omitted
-
-							    //when
-							    Order order = orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
-
-							    //then
-							    //omitted
-							}
-						</code></pre>
+						<img src="images/dummy.png" alt="dummy"/>
 					</section>
 					<section>
 						<h3>Fake</h3>
-						<p>Have working implementations but take shortcuts that make them not suitable for production.</p>
-						<pre><code class="java" style="font-size: 18px" data-trim contenteditable>
-							private class FakeTaxCalculator implements TaxCalculator {
-							    private final BigDecimal tax = new BigDecimal(0.1).setScale(2, BigDecimal.ROUND_HALF_UP);
-							    @Override
-							    public BigDecimal calculate(final BigDecimal subtotal, final String state) {
-							        return subtotal.multiply(tax).setScale(2, BigDecimal.ROUND_HALF_UP);
-							    }
-							}
-
-							@Test
-							public void canPlaceOrder() {
-							    //given
-							    OrderRegister orderRegister = new OrderRegister(Mockito.mock(OrderRepository.class), new FakeTaxCalculator());
-							    ShoppingCart cart = new ShoppingCart();
-							    cart.add(new Product("PROD-001", "Product 1", new BigDecimal(10.00)));
-							    cart.add(new Product("PROD-002", "Product 2", new BigDecimal(5.00)));
-							    ShippingAddress shippingAddress = new ShippingAddress("Daniel Aquino", "1234 Test Street", "", "Nashville", "TN", "37217");
-
-							    //when
-							    Order order = orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
-
-							    //then
-							    assertEquals(new BigDecimal(15.00), order.getSubtotal());
-							    assertEquals(new BigDecimal(1.50), order.getTax());
-							    assertEquals(new BigDecimal(16.50), order.getTotal());
-							}
-						</code></pre>
+						<img src="images/fake.png" alt="fake"/>
 					</section>
 					<section>
 						<h3>Stub</h3>
-						<p>Provide canned responses when called</p>
-						<pre><code class="java" style="font-size: 18px" data-trim contenteditable>
-							private static class StubTaxCalculator implements TaxCalculator {
-							    private final BigDecimal tax;
-
-							    public StubTaxCalculator(final BigDecimal tax) {
-							        this.tax = tax.setScale(2, BigDecimal.ROUND_HALF_UP);
-							    }
-
-							    @Override
-							    public BigDecimal calculate(final BigDecimal subtotal, final String state) {
-							        return tax;
-							    }
-							}
-
-							@Test
-							public void canPlaceOrder() {
-							    //given
-							    OrderRegister orderRegister = new OrderRegister(Mockito.mock(OrderRepository.class), new StubTaxCalculator(new BigDecimal(1.50)));
-							    ShoppingCart cart = new ShoppingCart();
-							    cart.add(new Product("PROD-001", "Product 1", new BigDecimal(10.00)));
-							    cart.add(new Product("PROD-002", "Product 2", new BigDecimal(5.00)));
-							    ShippingAddress shippingAddress = new ShippingAddress("Daniel Aquino", "1234 Test Street", "", "Nashville", "TN", "37217");
-
-							    //when
-							    Order order = orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
-
-							    //then
-							    assertEquals(new BigDecimal(15.00), order.getSubtotal());
-							    assertEquals(new BigDecimal(1.50), order.getTax());
-							    assertEquals(new BigDecimal(16.50), order.getTotal());
-							}
-						</code></pre>
+						<img src="images/stub.png" alt="stub" style="height: 575px;"/>
 					</section>
 					<section>
 						<h3>Spy</h3>
-						<p>Record information on how they were called.</p>
-						<pre><code class="java" style="font-size: 18px" data-trim contenteditable>
-							private class OrderRepositorySpy implements OrderRepository {
-							    private Order order;
-
-							    public SpyOrderRepository() {
-							    }
-
-							    @Override
-							    public void save(final Order order) {
-							        this.order = order;
-							    }
-
-							    public Order getOrder() {
-							        return order;
-							    }
-							}
-
-							@Test
-							public void placedOrderIsPersisted() {
-							    //given omitted
-						      OrderRepositorySpy orderRepositorySpy = new OrderRepositorySpy()
-						      OrderRegister = new OrderRegister(orderRepositorySpy, new FakeTaxCalculator());
-
-							    //when
-							    orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
-
-							    //then
-							    Order savedOrder = orderRepositorySpy.getOrder();
-							    Assert.assertEquals("daniel.j.aquino@gmail.com", savedOrder.getUserId());
-							}
-						</code></pre>
+						<img src="images/spy.png" alt="spy"/>
 					</section>
 					<section>
 						<h3>Mock</h3>
-						<p>Pre-programmed with expectations of calls they should receive</p>
-						<pre><code class="java" style="font-size: 18px" data-trim contenteditable>
-							@Test
-							public void placedOrderIsPersisted() {
-							    //given
-							    OrderRepository orderRepository = Mockito.mock(OrderRepository.class);
-							    TaxCalculator taxCalculator = Mockito.mock(TaxCalculator.class);
-							    OrderRegister = orderRegister = new OrderRegister(orderRepository, taxCalculator);
-							    ShoppingCart cart = new ShoppingCart();
-							    cart.add(new Product("PROD-001", "Product 1", new BigDecimal(10.00)));
-							    ShippingAddress shippingAddress = new ShippingAddress("Daniel Aquino", "1234 Test Street", "", "Nashville", "TN", "37217");
-							    Mockito.when(taxCalculator.calculate(Mockito.any(BigDecimal.class), Mockito.any(String.class))).thenReturn(new BigDecimal(0));
-
-							    //when
-							    orderRegister.placeOrder(cart, "daniel.j.aquino@gmail.com", shippingAddress);
-
-							    //then
-							    Mockito.verify(orderRepository).save(Mockito.any(Order.class));
-							}
-						</code></pre>
+						<img src="images/mock.png" alt="mock">
 					</section>
 				</section>
 				<section>
@@ -271,7 +141,7 @@
 						<h3>Integration Tests</h3>
 					</section>
 					<section>
-						<img src="images/integration_test.png" alt="integration test" style="height: 650px;"/>
+						<img src="images/integration_test.png" alt="integration test"/>
 					</section>
 					<section>
 						<img src="images/assert_order_details.png" alt="assertion"/>
@@ -332,9 +202,8 @@
 						<li class="fragment">Pros
 							<ul>
 								<li class="fragment">Shorter feedback loop</li>
-								<li class="fragment">Less mistakes made if run multiple times.</li>
-								<li class="fragment">Helps with refactoring</li>
 								<li class="fragment">Automated regression tests</li>
+								<li class="fragment">Helps with refactoring</li>
 							</ul>
 						</li>
 						<li class="fragment">Cons
@@ -369,6 +238,7 @@
 					{ src: 'plugin/markdown/marked.js' },
 					{ src: 'plugin/markdown/markdown.js' },
 					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
 					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
 				]
 			});

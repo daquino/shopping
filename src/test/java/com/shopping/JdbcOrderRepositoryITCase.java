@@ -20,28 +20,22 @@ import java.util.List;
 public class JdbcOrderRepositoryITCase {
 
     private JdbcOrderRepository orderRepository;
-    private static RelationalInstance instance;
+    private RelationalInstance instance;
 
-    @BeforeClass
-    public static void setupClass() throws SQLException {
+    @Before
+    public void setup() throws SQLException {
         instance = new RelationalInstance(Paths.get(System.getProperty("sql.schema.path")));
+        orderRepository = new JdbcOrderRepository(instance.getDataSource());
     }
 
     @After
-    public static void tearDown() throws SQLException {
+    public void tearDown() throws SQLException {
         instance.cleanup();
-    }
-
-    @Before
-    public void setup() {
-        orderRepository = new JdbcOrderRepository(instance.getDataSource());
     }
 
     @Test
     public void canSave() throws SQLException {
         //given
-        RelationalInstance instance = new RelationalInstance(Paths.get(System.getProperty("sql.schema.path")));
-        orderRepository = new JdbcOrderRepository(instance.getDataSource());
         Product ponyProduct = new Product("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
                 new BigDecimal(21.99));
         BigDecimal subtotal = new BigDecimal(21.99).setScale(2, RoundingMode.HALF_UP);
