@@ -36,6 +36,17 @@ public class JdbcOrderRepositoryITCase {
     @Test
     public void canSave() throws SQLException {
         //given
+        Order order = createExampleOrder();
+
+        //when
+        orderRepository.save(order);
+
+        //then
+        assertOrderDetails(order);
+        assertOrderItems(order);
+    }
+
+    private Order createExampleOrder() {
         Product ponyProduct = new Product("4459EAD4", "My Little Pony Pinkie Pie Sweet Style Pony Playset",
                 new BigDecimal(21.99));
         BigDecimal subtotal = new BigDecimal(21.99).setScale(2, RoundingMode.HALF_UP);
@@ -45,15 +56,8 @@ public class JdbcOrderRepositoryITCase {
         items.add(new LineItem(ponyProduct, 1));
         ShippingAddress shippingAddress = new ShippingAddress("Daniel Aquino", "1234 Test Street",
                 "Suite 100", "Nashville", "TN", "37013");
-        Order order = new Order("12345", subtotal, tax, total, "daniel.j.aquino@gmail.com",
+        return new Order("12345", subtotal, tax, total, "daniel.j.aquino@gmail.com",
                 shippingAddress, items);
-
-        //when
-        orderRepository.save(order);
-
-        //then
-        assertOrderDetails(order);
-        assertOrderItems(order);
     }
 
     @Test
