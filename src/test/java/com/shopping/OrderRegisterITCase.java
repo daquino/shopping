@@ -40,6 +40,7 @@ public class OrderRegisterITCase {
 
         //then
         assertOrderDetails(order);
+        assertOrderItems(order);
     }
 
     private ShoppingCart buildSampleShoppingCart(final Product product) {
@@ -71,6 +72,28 @@ public class OrderRegisterITCase {
             }
             else {
                 Assert.fail("Should have results");
+            }
+            statement.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void assertOrderItems(final Order order) {
+        try (Connection connection = instance.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement("select * from order_item")) {
+            ResultSet resultSet = statement.executeQuery();
+            for (LineItem item : order.getItems()) {
+                if (resultSet.next()) {
+                    Assert.assertEquals(order.getOrderId(), resultSet.getString(1));
+                    Assert.assertEquals(item.getSku(), resultSet.getString(2));
+                    Assert.assertEquals(item.getName(), resultSet.getString(3));
+                    Assert.assertEquals(item.getPrice(), resultSet.getBigDecimal(4));
+                    Assert.assertEquals(item.getQuantity(), resultSet.getInt(5));
+                }
+                else {
+                    Assert.fail("Should have order items.");
+                }
             }
             statement.close();
         } catch (SQLException e) {
